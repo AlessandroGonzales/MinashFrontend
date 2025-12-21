@@ -6,6 +6,9 @@ export default {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        satoshi: ['Satoshi', 'sans-serif']
+      },
       colors: {
         primary: "#FFFFFF",
         blackDeep: "#000000",
