@@ -1,0 +1,46 @@
+import { API_BASE_URL } from "../App";
+const SIMULATED_DOMAIN = "https://minash.local";
+
+/**
+ * Convierte el arreglo de strings de URLs a una URL real para mostrar.
+ * @param {Array<string> | string} imageArray El arreglo de URLs que viene de la base de datos (o la URL simple, por compatibilidad).
+ * @returns {string | null} La URL que el navegador puede cargar o null/cadena vacía si no hay imagen válida.
+ */
+export function getDisplayImageUrl(imageArray) {
+    let simulatedUrl = null;
+
+    // A) Manejo si todavía viene un string simple (compatibilidad)
+    if (typeof imageArray === 'string') {
+        simulatedUrl = imageArray;
+    } 
+    // B) Manejo del nuevo arreglo de strings (URLs)
+    else if (Array.isArray(imageArray) && imageArray.length > 0) {
+        // *** CAMBIO CRÍTICO AQUÍ: Tomamos el primer elemento directamente,
+        // *** ya que es una string, no un objeto con propiedad 'url'.
+        simulatedUrl = imageArray[0]; 
+        
+        // Si quieres manejar el caso en que el primer elemento NO es un string:
+        // if (typeof imageArray[0] === 'string') {
+        //     simulatedUrl = imageArray[0];
+        // }
+    }
+
+    // ----------------------------------------------------
+    // Lógica de reemplazo (Verificación y Transformación)
+    // ----------------------------------------------------
+
+    // 1. Verificar que tengamos una URL (string) para procesar
+    if (typeof simulatedUrl !== 'string' || !simulatedUrl) {
+        // En caso de que el arreglo estuviera vacío o el primer elemento no fuera una string
+        return null; // Retorna null si no hay URL válida
+    }
+    
+    // 2. Aplicar la lógica de reemplazo del dominio simulado
+    if (simulatedUrl.startsWith(SIMULATED_DOMAIN)) {
+        // Reemplaza el dominio simulado por la URL base de tu API
+        return simulatedUrl.replace(SIMULATED_DOMAIN, API_BASE_URL);
+    }
+    
+    // 3. Retornar la URL tal como está si no necesita reemplazo (ya es real o externa)
+    return simulatedUrl;
+}
