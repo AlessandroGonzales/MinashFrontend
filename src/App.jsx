@@ -17,6 +17,7 @@ import Garments from "./pages/garments";
 import Contacto from "./pages/contact";
 import Login from "./pages/login";
 import Serigraphy from "./pages/serigraphy";
+import ServiceDetail from "./pages/ServiceDetail";
 
 // Pages privadas
 import Profile from "./pages/user/Profile";
@@ -37,6 +38,7 @@ export default function App() {
             <Route path="/serigraphy" element={<Serigraphy />} />
             <Route path="/contact" element={<Contacto />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/serigraphy/:id" element={<ServiceDetail />} />
 
             {/* 🔐 RUTAS PRIVADAS (cualquier usuario logueado) */}
             <Route

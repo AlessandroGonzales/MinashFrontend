@@ -42,7 +42,7 @@ export default function Navbar() {
     logout();
     setShowUserMenu(false);
     navigate("/", { replace: true });
-    toastBye(`Esperamos verte pronto, ${user.name} `)
+    toastBye(`Esperamos verte pronto, ${user.name} `);
   };
 
   const closeUserMenu = () => setShowUserMenu(false);
@@ -113,8 +113,7 @@ export default function Navbar() {
 
         {/* MOBILE MENU */}
         {open && (
-          <div className="lg:hidden bg-blackDeep text-primary px-6 py-10 border-t border-steel space-y-6">
-        
+          <div className="lg:hidden bg-black/70 text-primary px-6 py-5 border-t border-steel space-y-6 ">
             <Link
               to="/"
               onClick={() => setOpen(false)}
@@ -150,8 +149,11 @@ export default function Navbar() {
                 setOpen(false);
                 handleUserClick();
               }}
-              className="flex items-center gap-3 hover:text-gold transition py-2"
+              className="flex items-center gap-3 hover:text-gold transition "
             >
+              <span className="text-lg">
+                {isAuthenticated ? `${user.name}` : "Iniciar sesión"}
+              </span>
               {isAuthenticated && user?.imageUrl ? (
                 <img
                   src={getDisplayImageUrl(user.imageUrl)}
@@ -161,9 +163,6 @@ export default function Navbar() {
               ) : (
                 <User size={24} />
               )}
-              <span className="text-lg">
-                {isAuthenticated ? "Mi cuenta" : "Iniciar sesión"}
-              </span>
             </button>
           </div>
         )}

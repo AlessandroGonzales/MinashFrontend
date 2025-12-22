@@ -98,17 +98,17 @@ export default function HomeHighlightsSection() {
         </div>
 
         {/* DESKTOP: collage artístico */}
-        <div className="relative w-full h-[640px] hidden sm:block">
+        <div className="relative w-full h-[740px] hidden sm:block">
           <img
             src="src/assets/childrens.jpg"
             alt="Cliente 1"
-            className="absolute top-10 left-16 w-56 lg:w-64 rounded-xl shadow-lg rotate-[-4deg]"
+            className="absolute top-10 left-5 w-56 lg:w-64 rounded-xl shadow-lg rotate-[-4deg]"
           />
 
           <img
             src="src/assets/shirt.jpg"
             alt="Cliente 2"
-            className="absolute top-20 right-16 w-60 lg:w-72 rounded-xl shadow-lg rotate-[6deg]"
+            className="absolute top-20 right-1 w-60 lg:w-72 rounded-xl shadow-lg "
           />
 
           <img
@@ -120,7 +120,7 @@ export default function HomeHighlightsSection() {
           <img
             src="src/assets/family.jpg"
             alt="Cliente 4"
-            className="absolute bottom-6 right-1/4 w-56 lg:w-64 rounded-xl shadow-lg rotate-[-6deg]"
+            className="absolute bottom-2 right-28 w-56 lg:w-64 rounded-xl shadow-lg rotate-[2deg]"
           />
         </div>
       </div>

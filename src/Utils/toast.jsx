@@ -10,13 +10,15 @@ const baseConfig = {
   draggable: true,
   progress: undefined,
   theme: "dark",
+  
 };
 
 const customToast = (type, message, icon) => {
   toast(
-    <div className="flex items-center gap-4">
+    <div className="flex items-center gap-4 ">
       <div className={`p-2 rounded-full ${
         type === 'success' ? 'bg-gold/20' :
+        type === 'bye' ? 'bg-gold/20':  
         type === 'error' ? 'bg-red-900/30' :
         type === 'warning' ? 'bg-yellow-900/30' :
         'bg-blue-900/30' 

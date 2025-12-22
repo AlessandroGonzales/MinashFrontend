@@ -159,7 +159,7 @@ export default function Profile() {
               <img
                 src={getDisplayImageUrl(profile.imageUrl)}
                 alt="Foto de perfil"
-                className="w-64 h-64 object-cover rounded-full border-4 border-gold shadow-2xl"
+                className="w-64 h-64 object-cover rounded-full shadow-2xl"
               />
             ) : (
               <div className="w-64 h-64 bg-graphite rounded-full border-4 border-gold flex items-center justify-center shadow-2xl">

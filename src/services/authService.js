@@ -67,3 +67,13 @@ export const getServicesByQuality = async (quality) => {
   });
   return response.data;
 };
+
+export const getServiceById = async (id) => {
+  const token = localStorage.getItem("token");
+  const response = await api.get(`${API_BASE_URL}/api/service/${id}`, {
+    headers: {
+      "Authorization": `Bearer ${token} `
+    }
+  })
+  return response.data
+}
