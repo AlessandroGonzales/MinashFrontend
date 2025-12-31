@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-export const API_BASE_URL = "https://localhost:7082"
+export const API_BASE_URL = "https://localhost:7082";
 
 // Layout
 import Navbar from "./components/Navbar";
@@ -18,6 +18,7 @@ import Contacto from "./pages/contact";
 import Login from "./pages/login";
 import Serigraphy from "./pages/serigraphy";
 import ServiceDetail from "./pages/ServiceDetail";
+import Cart from "./pages/cart/cart";
 
 // Pages privadas
 import Profile from "./pages/user/Profile";
@@ -30,7 +31,6 @@ export default function App() {
 
         <main className="pt-24">
           <Routes>
-
             {/* 🌍 RUTAS PÚBLICAS */}
             <Route path="/" element={<Home />} />
             <Route path="/services" element={<Servicios />} />
@@ -49,6 +49,14 @@ export default function App() {
                 </PrivateRoute>
               }
             />
+            <Route
+              path="/carrito"
+              element={
+                <PrivateRoute>
+                  <Cart />
+                </PrivateRoute>
+              }
+            />
 
             {/* 🧑‍💼 ADMIN (si tenías vistas exclusivas luego se agregan aquí) */}
             {/*
@@ -61,7 +69,6 @@ export default function App() {
               }
             />
             */}
-
           </Routes>
         </main>
 

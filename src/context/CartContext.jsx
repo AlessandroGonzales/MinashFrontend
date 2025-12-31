@@ -6,23 +6,34 @@ export const CartProvider = ({ children }) => {
   const [cart, setCart] = useState([]);
 
   const addToCart = (item) => {
-    setCart((prev) => {
-      const existing = prev.find(
-        (i) => i.id === item.id && i.color === item.color
-      );
-      if (existing) {
-        return prev.map((i) =>
-          i.id === item.id && i.color === item.color
-            ? { ...i, quantity: i.quantity + item.quantity }
-            : i
-        );
-      }
-      return [...prev, item];
-    });
-  };
+  setCart(prev => {
+    const existing = prev.find(i =>
+      i.idService === item.idService &&
+      i.selectedColor === item.selectedColor &&
+      i.selectedSize === item.selectedSize
+    );
 
-  const getTotalItems = () => cart.reduce((sum, i) => sum + i.quantity, 0);
-  const getTotalPrice = () => cart.reduce((sum, i) => sum + i.price * i.quantity, 0);
+    if (existing) {
+      return prev.map(i =>
+        i === existing
+          ? {
+              ...i,
+              count: i.count + item.count,
+              subtotal: (i.count + item.count) * i.unitPrice
+            }
+          : i
+      );
+    }
+
+    return [...prev, item];
+  });
+};
+
+ const getTotalItems = () =>
+  cart.reduce((sum, i) => sum + i.count, 0);
+
+const getTotalPrice = () =>
+  cart.reduce((sum, i) => sum + i.subtotal, 0);
   const clearCart = () => setCart([]);
 
   return (

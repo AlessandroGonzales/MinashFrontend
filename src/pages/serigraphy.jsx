@@ -5,6 +5,7 @@ import { toastError, toastInfo } from "../Utils/toast";
 import { useAuth } from "../context/AuthContext";
 import AuthModal from "../components/auth/AuthModal";
 import { useNavigate } from "react-router-dom";
+import { getDisplayImageUrl } from "../Utils/ImageUtils";
 
 const Services = () => {
   const [services, setServices] = useState([]);
@@ -176,7 +177,7 @@ const Services = () => {
     ? `serigraphy_warning_accepted_user_${user.iduser}`
     : null;
 
-  const handleBuyClick = (id) => {
+  const handleBuyClick = (idService) => {
     if (!isAuthenticated) {
       setShowAuthModal(true);
       toastInfo("Debes iniciar sesión para realizar la compra");
@@ -187,15 +188,14 @@ const Services = () => {
 
     if (
       !alreadyAccepted &&
-      services.serviceName.toLowerCase().includes("serigrafía")
+      services?.serviceName?.toLowerCase().includes("serigrafía")
     ) {
       setShowSerigraphyModal(true);
-      // Guardamos temporalmente el servicio para usarlo después
       sessionStorage.setItem("pendingService", JSON.stringify(services));
       return;
     }
 
-    navigate(`/serigraphy/${id}`);
+    navigate(`/serigraphy/${idService}`);
   };
 
   return (
@@ -272,7 +272,7 @@ const Services = () => {
                     <div className="relative h-56 sm:h-64 md:h-72 overflow-hidden">
                       {service.imageUrl ? (
                         <img
-                          src={service.imageUrl}
+                          src={getDisplayImageUrl(service.imageUrl)}
                           alt={service.serviceName}
                           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                         />

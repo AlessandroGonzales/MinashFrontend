@@ -77,3 +77,61 @@ export const getServiceById = async (id) => {
   })
   return response.data
 }
+
+export const createDetailsOrder = async (detailsOrder) => {
+  const token = localStorage.getItem("token");
+  if (!token) throw new Error("No autenticado");
+
+  const response = await api.post(
+    `${API_BASE_URL}/api/DetailsOrder`,
+    detailsOrder,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  return response.data;
+};
+
+
+export const getDraftOrder = async () => {
+  const token = localStorage.getItem("token");
+  if (!token) throw new Error("No autenticado");
+
+  const response = await api.get(
+    `${API_BASE_URL}/api/order/draft`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  return response.data;
+};
+
+export const getDetailsByOrderId = async (orderId) => {
+  const token = localStorage.getItem("token");
+
+  const res = await api.get(
+    `${API_BASE_URL}/api/detailsorder/by-order/${orderId}`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
+  return res.data;
+};
+
+export const getCustomsByOrderId = async (orderId) => {
+  const token = localStorage.getItem("token");
+
+  const res = await api.get(
+    `${API_BASE_URL}/api/custom/by-order/${orderId}`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
+  return res.data;
+};

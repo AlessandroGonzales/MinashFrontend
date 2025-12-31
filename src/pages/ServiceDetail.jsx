@@ -3,27 +3,22 @@ import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, ShoppingCart } from "lucide-react";
 import { getServiceById } from "../services/authService"; // Crea esta función en authService
 import { toastSuccess, toastError } from "../Utils/toast";
+import { useCart } from "../context/CartContext";
+import { createDetailsOrder } from "../services/authService";
+import { getDisplayImageUrl } from "../Utils/ImageUtils";
 
 const ServiceDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-
+  const { addToCart } = useCart();
   const [service, setService] = useState(null);
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
+  const [selectedSize, setSelectedSize] = useState("");
+  const [details, setDetails] = useState("");
   const [selectedColor, setSelectedColor] = useState("");
 
   // Colores comunes (puedes personalizar por servicio más adelante)
-  const availableColors = [
-    "Blanco",
-    "Negro",
-    "Gris",
-    "Azul Marino",
-    "Rojo",
-    "Verde",
-    "Amarillo",
-    "Rosa",
-  ];
 
   useEffect(() => {
     const fetchService = async () => {
@@ -38,8 +33,6 @@ const ServiceDetail = () => {
         setService(data);
         if (data.colors && data.colors.length > 0) {
           setSelectedColor(data.colors[0]);
-        } else {
-          setSelectedColor(availableColors[0]);
         }
       } catch (err) {
         console.error(err);
@@ -55,13 +48,27 @@ const ServiceDetail = () => {
     fetchService();
   }, [id, navigate]);
 
-  const handleAddToCart = () => {
+  const handleAddToCart = async () => {
     if (!selectedColor) {
-      toastError("Por favor selecciona un color");
+      toastError("Selecciona un color");
       return;
     }
 
-    toastSuccess(`¡${quantity} ${service.serviceName}(s) añadidos al carrito!`);
+    const detailsOrderRequest = {
+      count: quantity,
+      selectedColor,
+      selectedSize, // nuevo
+      details, // nuevo
+      idService: service.idService,
+      idGarmentService: null,
+    };
+    try {
+      await createDetailsOrder(detailsOrderRequest);
+      toastSuccess("Servicio añadido al pedido");
+    } catch (error) {
+      console.error(error);
+      toastError("No se pudo añadir el servicio al pedido");
+    }
   };
 
   if (loading) {
@@ -81,7 +88,7 @@ const ServiceDetail = () => {
   return (
     <div className="min-h-screen pt-12 pb-20 px-6 md:px-12 lg:px-32">
       <button
-        onClick={() => navigate("/servicios")}
+        onClick={() => navigate("/serigraphy")}
         className="flex items-center gap-2 text-ice/70 hover:text-gold transition mb-8"
       >
         <ArrowLeft className="w-5 h-5" />
@@ -93,9 +100,9 @@ const ServiceDetail = () => {
         <div className="relative rounded-2xl overflow-hidden shadow-2xl">
           {service.imageUrl ? (
             <img
-              src={service.imageUrl}
+              src={getDisplayImageUrl(service.imageUrl)}
               alt={service.serviceName}
-              className="w-full h-full object-cover max-h-96 lg:max-h-full"
+              className="w-full min-h-min object-cover max-h-96 lg:max-h-full"
             />
           ) : (
             <div className="bg-steel/30 h-96 flex items-center justify-center">
@@ -119,7 +126,7 @@ const ServiceDetail = () => {
             {/* Precio base */}
             <div>
               <span className="text-ice/70 text-lg">Precio por unidad:</span>
-              <span className="text-gold text-3xl font-bold ml-3">
+              <span className="text-gold text-xl font-bold ml-3">
                 ${service.servicePrice || "Consultar"}
               </span>
             </div>
@@ -134,8 +141,9 @@ const ServiceDetail = () => {
                 onChange={(e) => setSelectedColor(e.target.value)}
                 className="w-full bg-blackDeep border border-steel/70 rounded-xl px-5 py-4 text-ice focus:outline-none focus:border-gold/70 transition"
               >
-                {availableColors.map((color) => (
-                  <option key={color} value={color}>
+                <option value="">Seleccione un color</option>
+                {service.colors?.map((color, index) => (
+                  <option key={index} value={color}>
                     {color}
                   </option>
                 ))}
@@ -162,7 +170,7 @@ const ServiceDetail = () => {
             <div className="pt-6 border-t border-steel/50">
               <div className="flex justify-between items-center">
                 <span className="text-xl text-ice font-semibold">Total:</span>
-                <span className="text-gold text-4xl font-bold">
+                <span className="text-gold text-xl font-bold">
                   ${totalPrice.toFixed(2)}
                 </span>
               </div>
@@ -171,11 +179,23 @@ const ServiceDetail = () => {
             {/* Botón añadir al carrito */}
             <button
               onClick={handleAddToCart}
-              className="w-full py-5 rounded-xl bg-gold text-black font-bold text-lg uppercase hover:opacity-90 transition flex items-center justify-center gap-3 shadow-lg"
+              className="w-full py-3 rounded-xl bg-gold text-black font-bold text-lg uppercase hover:opacity-90 transition flex items-center justify-center gap-3 shadow-lg"
             >
               <ShoppingCart className="w-6 h-6" />
               Añadir al carrito
             </button>
+            <div>
+              <label className="text-ice font-medium mb-3 block">
+                Detalles adicionales
+              </label>
+              <textarea
+                value={details}
+                onChange={(e) => setDetails(e.target.value)}
+                placeholder="Ej: impresión frontal, tamaño A4, ubicación centrada..."
+                className="w-full bg-blackDeep border border-steel/70 rounded-xl px-5 py-4 text-ice focus:outline-none focus:border-gold/70 transition resize-none"
+                rows={4}
+              />
+            </div>
           </div>
         </div>
       </div>
