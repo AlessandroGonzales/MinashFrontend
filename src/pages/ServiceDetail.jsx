@@ -10,10 +10,12 @@ import { getDisplayImageUrl } from "../Utils/ImageUtils";
 const ServiceDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  // eslint-disable-next-line no-unused-vars
   const { addToCart } = useCart();
   const [service, setService] = useState(null);
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
+  // eslint-disable-next-line no-unused-vars
   const [selectedSize, setSelectedSize] = useState("");
   const [details, setDetails] = useState("");
   const [selectedColor, setSelectedColor] = useState("");

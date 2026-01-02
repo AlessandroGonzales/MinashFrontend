@@ -20,6 +20,7 @@ import ServiceDetail from "./pages/ServiceDetail";
 import Cart from "./pages/cart/cart";
 import FullServices from "./pages/FullService";
 import FullServiceDetails from "./pages/FullServiceDetails"
+import CustomService from "./pages/custom";
 
 // Pages privadas
 import Profile from "./pages/user/Profile";
@@ -40,7 +41,8 @@ export default function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/serigraphy/:id" element={<ServiceDetail />} />
             <Route path="/fullServices" element={<FullServices/>} />
-            <Route path="/fullServices/:id" element={<FullServiceDetails/>}></Route>
+            <Route path="/fullServices/:id" element={<FullServiceDetails/>}/>
+            <Route path="/custom" element={<CustomService />}/>
 
             {/* 🔐 RUTAS PRIVADAS (cualquier usuario logueado) */}
             <Route

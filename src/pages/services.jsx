@@ -10,6 +10,7 @@ const services = [
     icon: <Brush className="w-12 h-12 text-gold" />,
     hoverText: "Tu visión, nuestra aplicación precisa",
     comingSoon: false,
+    paths: "/custom",
   },
   {
     id: "full",
@@ -20,6 +21,7 @@ const services = [
     hoverText:
       "Paquetes integrales • Diseños predefinidos y ejecución impecable",
     comingSoon: false,
+    paths: "/fullServices",
   },
 ];
 
@@ -27,9 +29,10 @@ export default function Services() {
   const [hovered, setHovered] = useState(null);
   const navigate = useNavigate();
 
-  const navigations = () => {
-    navigate("/fullServices")
-  }
+  const handleNavigation = (path) => {
+    navigate(path);
+  };
+  
   return (
     <div className="min-h-screen bg-blackDeep text-primary py-16 md:py-14 px-6 md:px-12 lg:px-24">
       {/* Título principal con efecto sutil */}
@@ -57,6 +60,7 @@ export default function Services() {
               flex flex-col justify-between p-10 md:p-12
               ${service.comingSoon ? "opacity-60 pointer-events-none" : ""}
             `}
+            onClick={() => !service.comingSoon && handleNavigation(service.paths)}
           >
             {/* Fondo con efecto futurista sutil */}
             <div className="absolute inset-0 opacity-0 group-hover:opacity-40 transition-opacity duration-1000 pointer-events-none">
@@ -105,16 +109,19 @@ export default function Services() {
             {!service.comingSoon && (
               <div className="relative z-10 mt-auto">
                 <button
-                onClick={navigations}
+                  onClick={(e) => {
+                    e.stopPropagation(); 
+                    handleNavigation(service.paths);
+                  }}
                   className="
                     group/btn flex items-center gap-3 text-gold font-medium text-lg md:text-xl
                     transition-all duration-500 hover:text-primary
                   "
                 >
-                    <span className="relative">
-                      Conocer más
-                      <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gold group-hover/btn:w-full transition-all duration-500" />
-                    </span>
+                  <span className="relative">
+                    Conocer más
+                    <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gold group-hover/btn:w-full transition-all duration-500" />
+                  </span>
                   <ArrowRight className="w-6 h-6 transition-transform duration-500 group-hover/btn:translate-x-2" />
                 </button>
               </div>
