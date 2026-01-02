@@ -148,3 +148,13 @@ export const getGarmentServicesByQuality = async (quality) => {
   return response.data;
 }
 
+export const getGarmentServiceById = async (id) => {
+  const token = localStorage.getItem("token");
+  const response = await api.get(`${API_BASE_URL}/api/garmentService/${id}`, {
+    headers: {
+      "Authorization": `Bearer ${token} `
+    }
+  })
+  return response.data
+
+}

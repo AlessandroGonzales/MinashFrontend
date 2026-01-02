@@ -184,7 +184,7 @@ const FullServices = () => {
       return;
     }
 
-    navigate(`/services/${idService}`);
+    navigate(`/fullServices/${idService}`);
   };
 
   return (
