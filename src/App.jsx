@@ -13,12 +13,12 @@ import UserRoute from "./components/routeGuards/UserRoute";
 // Pages públicas
 import Home from "./pages/home";
 import Servicios from "./pages/services";
-import Garments from "./pages/garments";
 import Contacto from "./pages/contact";
 import Login from "./pages/login";
 import Serigraphy from "./pages/serigraphy";
 import ServiceDetail from "./pages/ServiceDetail";
 import Cart from "./pages/cart/cart";
+import FullServices from "./pages/FullService";
 
 // Pages privadas
 import Profile from "./pages/user/Profile";
@@ -34,11 +34,11 @@ export default function App() {
             {/* 🌍 RUTAS PÚBLICAS */}
             <Route path="/" element={<Home />} />
             <Route path="/services" element={<Servicios />} />
-            <Route path="/garments" element={<Garments />} />
             <Route path="/serigraphy" element={<Serigraphy />} />
             <Route path="/contact" element={<Contacto />} />
             <Route path="/login" element={<Login />} />
             <Route path="/serigraphy/:id" element={<ServiceDetail />} />
+            <Route path="/fullServices" element={<FullServices/>} />
 
             {/* 🔐 RUTAS PRIVADAS (cualquier usuario logueado) */}
             <Route

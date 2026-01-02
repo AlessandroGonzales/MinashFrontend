@@ -135,3 +135,16 @@ export const getCustomsByOrderId = async (orderId) => {
   );
   return res.data;
 };
+
+export const getGarmentService = async () => {
+  const response = await api.get(`${API_BASE_URL}/api/garmentService`);
+  return response.data;
+}
+
+export const getGarmentServicesByQuality = async (quality) => {
+  const response = await api.get(`${API_BASE_URL}/api/garmentService/filter`, {
+    params: { quality: quality.toLowerCase() },
+  });
+  return response.data;
+}
+

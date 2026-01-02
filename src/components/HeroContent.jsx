@@ -17,10 +17,10 @@ export default function HeroContent() {
       </p>
 
       <div className="mt-8 flex gap-4">
-        <Link to="/prendas" className="px-6 py-3 border border-steel rounded-md text-sm uppercase hover:bg-gold hover:text-blackDeep transition">
-          Ver Prendas
+        <Link to="/services" className="px-6 py-3 border border-steel rounded-md text-sm uppercase hover:bg-gold hover:text-blackDeep transition">
+          Ver Servicios
         </Link>
-        <Link to="/contacto" className="px-6 py-3 rounded-md text-sm uppercase bg-transparent border border-gold text-gold hover:bg-gold/10 transition">
+        <Link to="/contact" className="px-6 py-3 rounded-md text-sm uppercase bg-transparent border border-gold text-gold hover:bg-gold/10 transition">
           Contactar
         </Link>
       </div>

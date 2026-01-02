@@ -84,7 +84,16 @@ export default function ServicesCarousel() {
     setIndex((prev) => (prev - 1 + services.length) % services.length);
   };
 
-  if (loading) return <p className="text-center py-10">Cargando...</p>;
+    if (loading) {
+    return (
+      <div className=" bg-blackDeep flex flex-col items-center justify-center space-y-4">
+        <div className="w-12 h-12 border-t-2 border-gold rounded-full animate-spin"></div>
+        <p className="text-ice tracking-widest uppercase text-xs animate-pulse">
+          Cargando Sistema...
+        </p>
+      </div>
+    );
+  }
   if (error) return <p className="text-center py-10 text-red-500">{error}</p>;
   if (!services || services.length === 0) return <p className="text-center py-10">No hay servicios disponibles.</p>;
 

@@ -22,7 +22,7 @@ export default function Footer() {
           <br/>
           <button><li className="hover:text-gold transition">Serigrafia</li></button>
           <br/>
-          <button><li className="hover:text-gold transition">Prendas</li></button>
+          <button><li className="hover:text-gold transition">Servicios</li></button>
           <br/>
           <button><li className="hover:text-gold transition">Contacto</li></button>
           </ul>

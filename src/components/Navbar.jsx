@@ -73,12 +73,12 @@ export default function Navbar() {
               </Link>
             </li>
             <li>
-              <Link to="/prendas" className="hover:text-gold transition">
-                Prendas
+              <Link to="/services" className="hover:text-gold transition">
+                Servicios
               </Link>
             </li>
             <li>
-              <Link to="/contacto" className="hover:text-gold transition">
+              <Link to="/contact" className="hover:text-gold transition">
                 Contacto
               </Link>
             </li>
@@ -129,14 +129,14 @@ export default function Navbar() {
               Serigrafia
             </Link>
             <Link
-              to="/prendas"
+              to="/services"
               onClick={() => setOpen(false)}
               className="block hover:text-gold"
             >
-              Prendas
+              Servicios
             </Link>
             <Link
-              to="/contacto"
+              to="/contact"
               onClick={() => setOpen(false)}
               className="block hover:text-gold"
             >

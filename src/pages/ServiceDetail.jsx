@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, ShoppingCart } from "lucide-react";
-import { getServiceById } from "../services/authService"; // Crea esta función en authService
+import { getServiceById } from "../services/authService"; 
 import { toastSuccess, toastError } from "../Utils/toast";
 import { useCart } from "../context/CartContext";
 import { createDetailsOrder } from "../services/authService";
@@ -18,7 +18,7 @@ const ServiceDetail = () => {
   const [details, setDetails] = useState("");
   const [selectedColor, setSelectedColor] = useState("");
 
-  // Colores comunes (puedes personalizar por servicio más adelante)
+ 
 
   useEffect(() => {
     const fetchService = async () => {
@@ -42,7 +42,7 @@ const ServiceDetail = () => {
         setLoading(false);
       }
 
-      console.log("ID del servicio:", id); // ← Agrega esto
+      console.log("ID del servicio:", id);
     };
 
     fetchService();
@@ -57,8 +57,8 @@ const ServiceDetail = () => {
     const detailsOrderRequest = {
       count: quantity,
       selectedColor,
-      selectedSize, // nuevo
-      details, // nuevo
+      selectedSize, 
+      details, 
       idService: service.idService,
       idGarmentService: null,
     };
