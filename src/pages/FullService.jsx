@@ -12,8 +12,7 @@ const FullServices = () => {
   const [filteredServices, setFilteredServices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [showSerigraphyModal, setShowSerigraphyModal] = useState(false);
-  const { user, isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuth();
   const [showAuthModal, setShowAuthModal] = useState(false);
   const navigate = useNavigate();
 
@@ -102,7 +101,7 @@ const FullServices = () => {
     searchTerm !== "";
 
   const FilterPanel = () => (
-    <div className="bg-graphite/40 backdrop-blur-xl border border-steel/50 rounded-2xl p-6">
+    <div className="bg-graphite/40 backdrop-blur-xl  border-steel/50 rounded-2xl p-6">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
           <Filter className="w-7 h-7 text-gold" />
@@ -120,7 +119,7 @@ const FullServices = () => {
 
       {/* Técnica */}
       <div className="mb-8">
-        <h4 className="text-lg font-medium text-ice/100 mb-3 uppercase tracking-widest">
+        <h4 className="text-gl font-medium text-ice/100 mb-3 uppercase tracking-wider">
           Técnica
         </h4>
         <div className="space-y-2">
@@ -145,7 +144,7 @@ const FullServices = () => {
 
       {/* Calidad */}
       <div>
-        <h4 className="text-lg font-medium text-ice/100 mb-3 uppercase tracking-widest">
+        <h4 className="text-gl font-medium text-ice/100 mb-3 uppercase tracking-wider">
           Calidad
         </h4>
         <div className="space-y-2">
@@ -173,9 +172,6 @@ const FullServices = () => {
     </div>
   );
 
-  const serigraphyStorageKey = user
-    ? `serigraphy_warning_accepted_user_${user.iduser}`
-    : null;
 
   const handleBuyClick = (idService) => {
     if (!isAuthenticated) {
@@ -222,7 +218,7 @@ const FullServices = () => {
           <div className="lg:col-span-3">
             {/* Barra de búsqueda */}
             <div className="relative mb-10">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-ice/6    0 transition-colors duration-500" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-ice/6  0 transition-colors duration-500" />
               <input
                 type="text"
                 placeholder="Buscar servicios..."
@@ -238,7 +234,7 @@ const FullServices = () => {
                 {[1, 2, 3, 4, 5, 6].map((i) => (
                   <div
                     key={i}
-                    className="bg-graphite/30 border border-steel/20 rounded-2xl h-96 animate-pulse"
+                    className="bg-graphite/30  border-steel/20 rounded-2xl h-96 animate-pulse"
                   />
                 ))}
               </div>
@@ -259,7 +255,7 @@ const FullServices = () => {
                 {filteredServices.map((service) => (
                   <div
                     key={service.idService}
-                    className="group relative bg-graphite/40 backdrop-blur-xl border border-steel/30 rounded-2xl overflow-hidden transition-all duration-700 hover:border-gold/40 hover:shadow-2xl hover:shadow-gold/10"
+                    className="group relative bg-graphite/40 backdrop-blur-xl  border-steel/30 rounded-2xl overflow-hidden transition-all duration-700 hover:border-gold/40 hover:shadow-2xl hover:shadow-gold/10"
                   >
                     {/* Fondo efecto hover futurista */}
                     <div className="absolute inset-0 opacity-0 group-hover:opacity-30 transition-opacity duration-1000 pointer-events-none">
@@ -304,7 +300,7 @@ const FullServices = () => {
 
                         <button
                           onClick={() => handleBuyClick(service.idGarmentService)}
-                          className="flex items-center gap-2 px-4 py-2 rounded-full text-xs uppercase border-2 border-gold/50 text-gold hover:bg-gold/10 hover:border-gold transition-all duration-500 group-hover:translate-x-2"
+                          className="flex items-center gap-2 px-4 py-2 rounded-full text-xs sm:text-sm uppercase border-2 border-gold/50  text-gold hover:bg-gold/10 transition-all hover:border-gold duration-500 group-hover:translate-x-2"
                         >
                           Comprar
                         </button>
@@ -342,51 +338,7 @@ const FullServices = () => {
       </div>
       {showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} />}
 
-      {showSerigraphyModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-blackDeep/80">
-          <div className="bg-graphite/50 backdrop-blur-xl rounded-3xl p-10 max-w-lg mx-6 shadow-2xl border border-steel/30">
-            <h3 className="text-3xl font-bold text-gold mb-6 tracking-tight">
-              Aviso importante
-            </h3>
-
-            <p className="text-ice/90 text-base leading-relaxed mb-8">
-              Al continuar con la compra del servicio de{" "}
-              <strong>serigrafía</strong>, usted estará abonando únicamente la
-              técnica aplicada.
-              <br />
-              <br />
-              <strong>La prenda no está incluida</strong>. El cliente deberá
-              proporcionar las prendas sobre las cuales se realizará el
-              servicio.
-              <br />
-              <br />
-              Esta modalidad permite ofrecer un precio más accesible, ya que se
-              cobra exclusivamente el proceso técnico.
-            </p>
-
-            <div className="flex justify-end gap-4">
-              <button
-                onClick={() => {
-                  setShowSerigraphyModal(false);
-                }}
-                className="px-6 py-3 rounded-3xl border border-steel/50 text-ice/70 hover:text-primary hover:border-steel transition-all duration-500"
-              >
-                Cancelar
-              </button>
-
-              <button
-                onClick={() => {
-                  localStorage.setItem(serigraphyStorageKey, "true");
-                  setShowSerigraphyModal(false);
-                }}
-                className="px-7 py-3 rounded-3xl bg-gold/90 text-blackDeep font-bold hover:bg-gold transition-all duration-500"
-              >
-                Entendido, continuar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      
     </div>
   );
 };

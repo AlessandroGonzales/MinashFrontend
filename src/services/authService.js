@@ -56,10 +56,6 @@ export const patchUserField = async (id, field, value) => {
 
 };
 
-export const getAllServices = async () => {
-  const response = await api.get(`${API_BASE_URL}/api/service`);
-  return response.data;
-};
 
 export const getServicesByQuality = async (quality) => {
   const response = await api.get(`${API_BASE_URL}/api/service/filter`, {
@@ -94,7 +90,6 @@ export const createDetailsOrder = async (detailsOrder) => {
 
   return response.data;
 };
-
 
 export const getDraftOrder = async () => {
   const token = localStorage.getItem("token");
@@ -156,5 +151,31 @@ export const getGarmentServiceById = async (id) => {
     }
   })
   return response.data
-
 }
+
+export const getAllGarment = async () => {
+  const response = await api.get(`${API_BASE_URL}/api/garment`);
+  return response.data;
+};
+
+export const getAllServices = async () => {
+  const response = await api.get(`${API_BASE_URL}/api/service`);
+  return response.data;
+};
+
+export const createCustom = async (custom) => {
+ const token = localStorage.getItem("token");
+  if (!token) throw new Error("No autenticado");
+
+  const response = await api.post(
+    `${API_BASE_URL}/api/custom`,
+    custom,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  return response.data;
+};

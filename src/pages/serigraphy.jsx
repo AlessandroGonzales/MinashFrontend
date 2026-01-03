@@ -102,7 +102,7 @@ const Services = () => {
     searchTerm !== "";
 
   const FilterPanel = () => (
-    <div className="bg-graphite border border-steel/50 rounded-2xl p-6">
+    <div className="bg-graphite/40 backdrop-blur-xl  border-steel/50 rounded-2xl p-6">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
           <Filter className="w-7 h-7 text-gold" />
@@ -196,9 +196,14 @@ const Services = () => {
   };
 
   return (
-    <div className="min-h-screen pt-12 pb-16 px-6 md:px-12 lg:px-24 relative">
+    <div className="min-h-screen bg-blackDeep pt-12 text-primary py-16 md:py-10 px-6 md:px-12 lg:px-24 relative overflow-hidden">
+       <div className="absolute inset-0 opacity-10 pointer-events-none">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(201,168,106,0.08),transparent_70%)]" />
+      </div>
+
+
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-4xl md:text-5xl font-bold text-primary md:mb-20 mb-10 text-center">
+        <h1 className="text-4xl md:text-5xl lg:text-5xl font-bold text-primary mb-10 md:mb-24 text-center tracking-tight">
           Servicios de Serigrafia
         </h1>
 
@@ -206,7 +211,7 @@ const Services = () => {
         <div className="lg:hidden flex justify-center mb-6">
           <button
             onClick={() => setIsFilterOpen(true)}
-            className="flex items-center gap-2 bg-graphite border border-steel/50 px-5 py-3 rounded-xl text-ice hover:border-gold/50 transition-all"
+            className="flex items-center gap-2 bg-graphite/40 backdrop-blur-md  border border-steel/30 px-5 py-3 rounded-xl text-primary hover:border-gold/40 transition-all"
           >
             <Filter className="w-6 h-6 text-gold" />
             <span className="font-medium text-lg">Filtros</span>
@@ -216,7 +221,7 @@ const Services = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 lg:gap-12">
           {/* Panel lateral solo en desktop */}
-          <aside className="hidden lg:block lg:col-span-1 lg:pl-8 xl:pl-2">
+          <aside className="hidden lg:block lg:col-span-1">
             <div className="sticky top-28">
               <FilterPanel />
             </div>
@@ -232,7 +237,7 @@ const Services = () => {
                 placeholder="Buscar servicios..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full h-14 bg-graphite border border-steel/50 rounded-3xl pl-16 pr-8 py-4 text-primary placeholder-ice/50 focus:outline-none focus:border-gold/40 transition-all duration-700 hover:shadow-gold/5"
+                className="w-full h-14 bg-graphite/40 border border-steel/30 rounded-3xl pl-16 pr-8 py-4 text-primary placeholder-ice/50 focus:outline-none focus:border-gold/40 transition-all duration-700 hover:shadow-gold/5"
               />
             </div>
 
@@ -242,7 +247,7 @@ const Services = () => {
                 {[1, 2, 3, 4, 5, 6].map((i) => (
                   <div
                     key={i}
-                    className="bg-graphite/50 border border-steel/30 rounded-2xl h-96 animate-pulse"
+                    className="bg-graphite/30  border-steel/20 rounded-2xl h-96 animate-pulse"
                   />
                 ))}
               </div>
@@ -263,7 +268,7 @@ const Services = () => {
                 {filteredServices.map((service) => (
                   <div
                     key={service.idService}
-                    className="group relative bg-graphite border border-steel/40 rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl hover:border-gold/50 transition-all duration-300"
+                    className="group relative bg-graphite/40 backdrop-blur-xl border-steel/30 rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl hover:border-gold/50 transition-all duration-300"
                   >
                        {/* Fondo efecto hover futurista */}
                     <div className="absolute inset-0 opacity-0 group-hover:opacity-30 transition-opacity duration-1000 pointer-events-none">
@@ -289,7 +294,7 @@ const Services = () => {
 
                     {/* Contenido */}
                     <div className="p-5 sm:p-6">
-                      <h3 className="text-lg sm:text-xl font-bold text-ice mb-2">
+                      <h3 className="text-lg sm:text-xl font-bold text-primary mb-2">
                         {service.serviceName}
                       </h3>
 
@@ -321,18 +326,18 @@ const Services = () => {
 
         {isFilterOpen && (
           <div
-            className="fixed inset-0 bg-black/70 z-50 lg:hidden"
+            className="fixed inset-0 bg-blackDeep/80 z-50 lg:hidden"
             onClick={() => setIsFilterOpen(false)}
           >
             <div
-              className="absolute bottom-10  bg-graphite m-2 rounded-t-3xl p-6 max-h-[85vh]  overflow-y-auto"
+              className="absolute bottom-10  bg-blackDeep/90 backdrop-blur-xl m-2 rounded-t-3xl p-6 max-h-[85vh] overflow-y-auto"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="flex justify-between items-center mb-6">
-                <h3 className="text-2xl font-semibold text-ice">Filtros</h3>
+              <div className="flex justify-between items-center mb-8">
+                <h3 className="text-3xl font-bold text-primary">Filtros</h3>
                 <button
                   onClick={() => setIsFilterOpen(false)}
-                  className="p-2 rounded-full hover:bg-steel/30 transition-colors"
+                  className="p-3 rounded-full hover:bg-steel/30 transition-colors duration-500"
                 >
                   <X className="w-7 h-7 text-ice" />
                 </button>

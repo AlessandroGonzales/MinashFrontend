@@ -233,7 +233,7 @@ export default function Cart() {
                       </p>
 
                       {/* Acción Opcional: Eliminar */}
-                      <button className="text-[10px] text-steel hover:text-gold uppercase tracking-widest transition-colors">
+                      <button className="text-[12px] text-steel hover:text-gold uppercase tracking-widest transition-colors">
                         Remover
                       </button>
                     </div>
@@ -281,20 +281,35 @@ export default function Cart() {
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-2 gap-x-8 gap-y-2 text-sm text-ice mb-4">
-                        <div className="flex items-center gap-2">
-                          <span className="w-2 h-2 rounded-full bg-steel"></span>
-                          <span>{custom.selectedColor}</span>
+                      <div className="flex flex-wrap gap-3 mt-4">
+                        <div
+                          className="flex items-center gap-2 px-3 py-1.5 rounded-full
+                  bg-gradient-to-r from-gold/20 to-gold/5
+                  border border-gold/30"
+                        >
+                          <span className="w-2 h-2 rounded-full bg-gold"></span>
+                          <span className="text-xs uppercase tracking-wider text-ice">
+                            {custom.selectedColor}
+                          </span>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <span className="w-2 h-2 rounded-full bg-steel"></span>
-                          <span>{custom.selectedSize}</span>
-                        </div>
-                      </div>
 
-                      <p className="text-sm text-ice/70 leading-relaxed max-w-lg">
-                        "{custom.customerDetails}"
-                      </p>
+                        {custom.selectedSize && (
+                          <div
+                            className="px-3 py-1.5 rounded-full bg-steel/10 border border-steel/30
+                    text-xs uppercase tracking-wider text-ice
+                    animate-[fadeInUp_0.3s_ease-out_forwards]"
+                          >
+                            Talla {custom.selectedSize}
+                          </div>
+                        )}
+                      </div>
+                      {custom.customerDetails && (
+                        <div className="bg-blackDeep/30 p-3 border-l mt-6 border-gold/50">
+                          <p className="text-steel text-sm italic leading-relaxed line-clamp-2">
+                            "{custom.customerDetails}"
+                          </p>
+                        </div>
+                      )}
                     </div>
 
                     <div className="mt-6 flex items-center justify-between border-t border-steel/10 pt-4">
@@ -304,6 +319,9 @@ export default function Cart() {
                           {custom.count}
                         </span>
                       </p>
+                      <button className="text-[12px] text-steel hover:text-gold uppercase tracking-widest transition-colors">
+                        Remover
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -312,13 +330,13 @@ export default function Cart() {
           </div>
 
           {/* COLUMNA DERECHA: RESUMEN (Sticky) */}
-          <div className="lg:col-span-4">
-            <div className="bg-graphite p-8 rounded-2xl sticky top-8 border border-steel/20 shadow-2xl shadow-blackDeep/50">
+          <div className="lg:col-span-4 ">
+            <div className="sticky top-24 bg-graphite/60 backdrop-blur-xl border border-white/5 rounded-3xl p-8 shadow-2xl ">
               <h3 className="text-lg font-light text-primary mb-6 border-b border-steel/30 pb-4">
                 Resumen de Orden
               </h3>
 
-              <div className="space-y-4 mb-8">
+              <div className="space-y-4 mb-8 ">
                 <div className="flex justify-between text-ice text-sm">
                   <span>Subtotal</span>
                   <span>${order?.total?.toLocaleString("en-US")}</span>
