@@ -21,6 +21,7 @@ import Cart from "./pages/cart/cart";
 import FullServices from "./pages/FullService";
 import FullServiceDetails from "./pages/FullServiceDetails"
 import CustomService from "./pages/custom";
+import NotFound from "./pages/NotFound";
 
 // Pages privadas
 import Profile from "./pages/user/Profile";
@@ -35,6 +36,7 @@ export default function App() {
           <Routes>
             {/* 🌍 RUTAS PÚBLICAS */}
             <Route path="/" element={<Home />} />
+            <Route path="*" element={<NotFound />}/>
             <Route path="/services" element={<Servicios />} />
             <Route path="/serigraphy" element={<Serigraphy />} />
             <Route path="/contact" element={<Contacto />} />

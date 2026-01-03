@@ -1,9 +1,7 @@
 import { useState, useEffect } from "react";
 import { Search, Filter, X } from "lucide-react";
 import { getGarmentService, getGarmentServicesByQuality } from "../services/authService";
-import { toastError, toastInfo } from "../Utils/toast";
-import { useAuth } from "../context/AuthContext";
-import AuthModal from "../components/auth/AuthModal";
+import { toastError } from "../Utils/toast";
 import { useNavigate } from "react-router-dom";
 import { getDisplayImageUrl } from "../Utils/ImageUtils";
 
@@ -12,8 +10,6 @@ const FullServices = () => {
   const [filteredServices, setFilteredServices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const { isAuthenticated } = useAuth();
-  const [showAuthModal, setShowAuthModal] = useState(false);
   const navigate = useNavigate();
 
   // Filtros
@@ -174,12 +170,6 @@ const FullServices = () => {
 
 
   const handleBuyClick = (idService) => {
-    if (!isAuthenticated) {
-      setShowAuthModal(true);
-      toastInfo("Debes iniciar sesión para realizar la compra");
-      return;
-    }
-
     navigate(`/fullServices/${idService}`);
   };
 
@@ -336,8 +326,6 @@ const FullServices = () => {
           </div>
         )}
       </div>
-      {showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} />}
-
       
     </div>
   );

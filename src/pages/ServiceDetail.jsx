@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, ShoppingCart } from "lucide-react";
-import { getServiceById } from "../services/authService"; 
-import { toastSuccess, toastError } from "../Utils/toast";
+import { ArrowLeft, ShoppingCart, Plus, Minus, Info } from "lucide-react";
+import { getServiceById } from "../services/authService";
+import { toastSuccess, toastError, toastInfo } from "../Utils/toast";
+import AuthModal from "../components/auth/AuthModal";
 import { useCart } from "../context/CartContext";
 import { createDetailsOrder } from "../services/authService";
 import { getDisplayImageUrl } from "../Utils/ImageUtils";
+import { useAuth } from "../context/AuthContext";
 
 const ServiceDetail = () => {
   const { id } = useParams();
@@ -15,12 +17,15 @@ const ServiceDetail = () => {
   const [service, setService] = useState(null);
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
-  // eslint-disable-next-line no-unused-vars
-  const [selectedSize, setSelectedSize] = useState("");
   const [details, setDetails] = useState("");
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showSerigraphyModal, setShowSerigraphyModal] = useState(false);
   const [selectedColor, setSelectedColor] = useState("");
+  const { user, isAuthenticated } = useAuth()
 
- 
+  const serigraphyStorageKey = user
+    ? `serigraphy_warning_accepted_user_${user.iduser}`
+    : null;
 
   useEffect(() => {
     const fetchService = async () => {
@@ -43,14 +48,11 @@ const ServiceDetail = () => {
       } finally {
         setLoading(false);
       }
-
-      console.log("ID del servicio:", id);
     };
-
     fetchService();
   }, [id, navigate]);
 
-  const handleAddToCart = async () => {
+  const proceedToAddToCart = async () => {
     if (!selectedColor) {
       toastError("Selecciona un color");
       return;
@@ -59,25 +61,43 @@ const ServiceDetail = () => {
     const detailsOrderRequest = {
       count: quantity,
       selectedColor,
-      selectedSize, 
-      details, 
+      selectedSize: "",
+      details,
       idService: service.idService,
       idGarmentService: null,
     };
     try {
       await createDetailsOrder(detailsOrderRequest);
-      toastSuccess("Servicio añadido al pedido");
+      toastSuccess("Servicio añadido al carrito");
     } catch (error) {
       console.error(error);
-      toastError("No se pudo añadir el servicio al pedido");
+      toastError("No se pudo añadir el servicio al carrito");
     }
   };
 
+  const handleAddToCart = async () => {
+    if (!isAuthenticated) {
+      setShowAuthModal(true);
+      toastInfo("Debes iniciar sesión para realizar la compra");
+      return;
+    }
+
+    const alreadyAccepted = localStorage.getItem(serigraphyStorageKey);
+
+    if (!alreadyAccepted) {
+      setShowSerigraphyModal(true);
+      return;
+    }
+
+    await proceedToAddToCart();
+  };
+
+
   if (loading) {
     return (
-      <div className="min-h-screen pt-20 px-6 flex items-center justify-center">
-        <div className="animate-pulse text-ice text-2xl">
-          Cargando detalle...
+      <div className="min-h-screen flex items-center justify-center bg-blackDeep">
+        <div className="relative">
+          <div className="w-12 h-12 border-4 border-gold/20 border-t-gold rounded-full animate-spin"></div>
         </div>
       </div>
     );
@@ -85,122 +105,196 @@ const ServiceDetail = () => {
 
   if (!service) return null;
 
+
   const totalPrice = (service.servicePrice || 0) * quantity;
 
   return (
-    <div className="min-h-screen pt-12 pb-20 px-6 md:px-12 lg:px-32">
-      <button
-        onClick={() => navigate("/serigraphy")}
-        className="flex items-center gap-2 text-ice/70 hover:text-gold transition mb-8"
-      >
-        <ArrowLeft className="w-5 h-5" />
-        Volver a servicios
-      </button>
+    <div className="min-h-screen bg-blackDeep text-ice selection:bg-gold/30 selection:text-gold pb-20">
+      {/* Header Navegación */}
+      <div className="max-w-7xl mx-auto px-6 pt-10">
+        <button
+          onClick={() => navigate("/serigraphy")}
+          className="group flex items-center gap-3 text-xs font-bold tracking-[0.3em] uppercase opacity-70 hover:opacity-100 transition-all"
+        >
+          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-2 transition-transform" />
+          Regresar
+        </button>
+      </div>
 
-      <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12">
-        {/* Imagen */}
-        <div className="relative rounded-2xl overflow-hidden shadow-2xl">
-          {service.imageUrl ? (
-            <img
-              src={getDisplayImageUrl(service.imageUrl)}
-              alt={service.serviceName}
-              className="w-full min-h-min object-cover max-h-96 lg:max-h-full"
-            />
-          ) : (
-            <div className="bg-steel/30 h-96 flex items-center justify-center">
-              <span className="text-gold text-8xl font-bold opacity-40">M</span>
-            </div>
-          )}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
-        </div>
-
-        {/* Detalles y formulario */}
-        <div className="flex flex-col justify-center">
-          <h1 className="text-4xl md:text-5xl font-bold text-ice mb-6">
-            {service.serviceName}
-          </h1>
-
-          <p className="text-ice/80 text-lg leading-relaxed mb-8">
-            {service.serviceDetails || service.description}
-          </p>
-
-          <div className="bg-graphite border border-steel/50 rounded-2xl p-8 space-y-8">
-            {/* Precio base */}
-            <div>
-              <span className="text-ice/70 text-lg">Precio por unidad:</span>
-              <span className="text-gold text-xl font-bold ml-3">
-                ${service.servicePrice || "Consultar"}
-              </span>
-            </div>
-
-            {/* Selección de color */}
-            <div>
-              <label className="text-ice font-medium mb-3 block">
-                Color de la prenda
-              </label>
-              <select
-                value={selectedColor}
-                onChange={(e) => setSelectedColor(e.target.value)}
-                className="w-full bg-blackDeep border border-steel/70 rounded-xl px-5 py-4 text-ice focus:outline-none focus:border-gold/70 transition"
-              >
-                <option value="">Seleccione un color</option>
-                {service.colors?.map((color, index) => (
-                  <option key={index} value={color}>
-                    {color}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Cantidad */}
-            <div>
-              <label className="text-ice font-medium mb-3 block">
-                Cantidad
-              </label>
-              <input
-                type="number"
-                min="1"
-                value={quantity}
-                onChange={(e) =>
-                  setQuantity(Math.max(1, parseInt(e.target.value) || 1))
-                }
-                className="w-full bg-blackDeep border border-steel/70 rounded-xl px-5 py-4 text-ice focus:outline-none focus:border-gold/70 transition"
-              />
-            </div>
-
-            {/* Total */}
-            <div className="pt-6 border-t border-steel/50">
-              <div className="flex justify-between items-center">
-                <span className="text-xl text-ice font-semibold">Total:</span>
-                <span className="text-gold text-xl font-bold">
-                  ${totalPrice.toFixed(2)}
+      <main className="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-12 gap-12 mt-12">
+        {/* Sección Izquierda: Imagen con efecto de profundidad */}
+         <div className="lg:col-span-7">
+          <div className="sticky top-10">
+            <div className="relative group rounded-[2.5rem] overflow-hidden bg-graphite  shadow-2xl">
+              {service.imageUrl ? (
+                <img
+                  src={getDisplayImageUrl(service.imageUrl)}
+                  alt={service.serviceName}
+                  className="w-full object-cover aspect-[4/5] lg:h-[75vh] group-hover:scale-105 transition-transform duration-1000"
+                />
+              ) : (
+                <div className="aspect-[4/5] flex items-center justify-center">
+                  <Layers className="w-20 h-20 text-gold/10" />
+                </div>
+              )}
+              {/* Overlay Futurista */}
+              <div className="absolute inset-0 bg-gradient-to-t from-blackDeep/80 via-transparent to-transparent opacity-60"></div>
+              <div className="absolute bottom-10 left-10">
+                <span className="bg-gold/90 text-blackDeep text-[10px] font-black px-3 py-1 rounded-full tracking-[0.2em] uppercase">
+                  {service.serviceName}
                 </span>
               </div>
             </div>
+          </div>
+        </div>
 
-            {/* Botón añadir al carrito */}
-            <button
-              onClick={handleAddToCart}
-              className="w-full py-3 rounded-xl bg-gold text-black font-bold text-lg uppercase hover:opacity-90 transition flex items-center justify-center gap-3 shadow-lg"
-            >
-              <ShoppingCart className="w-6 h-6" />
-              Añadir al carrito
-            </button>
-            <div>
-              <label className="text-ice font-medium mb-3 block">
-                Detalles adicionales
+        {/* Sección Derecha: Panel de Configuración Minimalista */}
+        <div className="lg:col-span-5 flex flex-col">
+          <header className="mb-10">
+            <h1 className="text-5xl uppercase tracking-tighter mb-4 leading-none">
+              {service.serviceName}
+            </h1>
+            <p className="text-ice/60 text-lg leading-relaxed ">
+              {service.serviceDetails || service.description}
+            </p>
+          </header>
+
+          <div className="space-y-10">
+            {/* Selector de Color - Estilo Moderno */}
+            <div className="space-y-4">
+              <label className="text-[10px] font-bold tracking-[0.3em] uppercase opacity-70">
+                Seleccionar Color
+              </label>
+              <div className="flex flex-wrap gap-3">
+                {service.colors?.map((color, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setSelectedColor(color)}
+                    className={`px-6 py-3 rounded-xl border text-xs font-bold uppercase tracking-widest transition-all duration-300 ${
+                      selectedColor === color
+                        ? "bg-gold text-blackDeep border-gold shadow-[0_10px_20px_rgba(212,175,55,0.2)]"
+                        : "border-white/10 hover:border-gold/50 text-ice/60"
+                    }`}
+                  >
+                    {color}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Cantidad y Precio unitario */}
+           <div className="flex items-center justify-between py-10 border-y border-white/5">
+              <div className="space-y-4">
+                <label className="text-[10px] font-bold tracking-[0.3em] uppercase opacity-70 block">Cantidad</label>
+                <div className="flex items-center bg-white/5 rounded-2xl p-1 border border-white/5">
+                  <button 
+                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                    className="w-10 h-10 flex items-center justify-center hover:text-gold transition-colors"
+                  >
+                    <Minus className="w-4 h-4" />
+                  </button>
+                  <span className="px-6 text-xl font-medium min-w-[3rem] text-center">{quantity}</span>
+                  <button 
+                    onClick={() => setQuantity(quantity + 1)}
+                    className="w-10 h-10 flex items-center justify-center hover:text-gold transition-colors"
+                  >
+                    <Plus className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+              <div className="text-right">
+                <label className="text-[10px] font-bold tracking-[0.3em] uppercase opacity-70 block mb-4">Precio Unitario</label>
+                <span className="text-3xl font-light">${service.servicePrice?.toLocaleString()}</span>
+              </div>
+            </div>
+
+            {/* Instrucciones Especiales */}
+            <div className="space-y-4">
+              <label className="flex items-center gap-2 text-xs font-bold tracking-[0.2em] uppercase opacity-70">
+                <Info className="w-3 h-3" /> Detalles de Personalización
               </label>
               <textarea
                 value={details}
                 onChange={(e) => setDetails(e.target.value)}
-                placeholder="Ej: impresión frontal, tamaño A4, ubicación centrada..."
-                className="w-full bg-blackDeep border border-steel/70 rounded-xl px-5 py-4 text-ice focus:outline-none focus:border-gold/70 transition resize-none"
-                rows={4}
+                placeholder="Indica tallas, posiciones o notas específicas..."
+                rows={3}
+                className="w-full bg-steel/25 border border-steel/90 rounded-2xl px-5 py-4 text-ice placeholder:opacity-60 focus:outline-none focus:border-gold/50 focus:ring-1 focus:ring-gold/50 transition-all resize-none"
               />
+            </div>
+
+            {/* Footer de Compra - Sticky en móvil */}
+            <div className="pt-6">
+              <div className="flex items-end justify-between mb-6">
+                <span className="text-sm opacity-70 mb-1">TOTAL ESTIMADO</span>
+                <span className="text-4xl  tracking-tighter text-gold">
+                  $
+                  {totalPrice.toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                  })}
+                </span>
+              </div>
+
+              <button
+                onClick={handleAddToCart}
+                className="group relative w-full bg-gold overflow-hidden py-5 rounded-2xl font-black uppercase tracking-widest text-blackDeep hover:shadow-[0_0_30px_rgba(212,175,55,0.4)] transition-all duration-500"
+              >
+                <div className="relative z-10 flex items-center justify-center gap-3">
+                  <ShoppingCart className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                  Añadir al Pedido
+                </div>
+                <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity" />
+              </button>
             </div>
           </div>
         </div>
-      </div>
+      </main>
+      {showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} />}
+      {showSerigraphyModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-blackDeep/80">
+          <div className="bg-graphite/50 backdrop-blur-xl rounded-3xl p-10 max-w-lg mx-6 shadow-2xl border border-steel/30">
+            <h3 className="text-3xl font-bold text-gold mb-6 tracking-tight">
+              Aviso importante
+            </h3>
+
+            <p className="text-ice/90 text-base leading-relaxed mb-8">
+              Al continuar con la compra del servicio de{" "}
+              <strong>serigrafía</strong>, usted estará abonando únicamente la
+              técnica aplicada.
+              <br />
+              <br />
+              <strong>La prenda no está incluida</strong>. El cliente deberá
+              proporcionar las prendas sobre las cuales se realizará el
+              servicio.
+              <br />
+              <br />
+              Esta modalidad permite ofrecer un precio más accesible, ya que se
+              cobra exclusivamente el proceso técnico.
+            </p>
+
+            <div className="flex justify-end gap-4">
+              <button
+                onClick={() => {
+                  setShowSerigraphyModal(false);
+                }}
+                className="px-6 py-3 rounded-3xl text-sm  border border-steel/50 text-ice/70 hover:text-primary hover:border-steel transition-all duration-500"
+              >
+                Cancelar
+              </button>
+
+              <button
+                onClick={async () => {
+                  localStorage.setItem(serigraphyStorageKey, "true");
+                  setShowSerigraphyModal(false);
+                  await proceedToAddToCart();
+                }}
+                className="px-1 py-1  text-sm rounded-3xl bg-gold/90 text-blackDeep font-bold hover:bg-gold transition-all duration-500"
+              >
+                Entendido, continuar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

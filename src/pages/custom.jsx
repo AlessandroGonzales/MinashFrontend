@@ -10,13 +10,14 @@ import {
   Scissors,
   Calculator,
   CheckCircle2,
-  Loader2
+  Loader2,
+  ArrowLeft,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import {
   getAllGarment,
   getAllServices,
-  createCustom
+  createCustom,
 } from "../services/authService";
 import { toastError, toastSuccess, toastInfo } from "../Utils/toast";
 import { getDisplayImageUrl } from "../Utils/ImageUtils";
@@ -165,7 +166,6 @@ export default function CustomService() {
         setIsSubmitting(false);
         navigate("/carrito");
       }, 1500);
-
     } catch (error) {
       console.error("Error creating custom order:", error);
       toastError("Error al crear la custom. ");
@@ -184,11 +184,20 @@ export default function CustomService() {
   return (
     <div className="min-h-screen bg-blackDeep text-primary font-satoshi selection:bg-gold selection:text-black">
       {/* Header */}
-      <div className="pt-24 pb-12 px-6 md:px-12 lg:px-24 text-center">
+      <div className="pt-14 pb-20 px-6 md:px-12 lg:px-24 text-center">
         <h1 className="text-5xl md:text-7xl font-bold tracking-tighter mb-4">
+          <div className="max-w-7xl mx-auto px-6 pt-10">
+            <button
+              onClick={() => navigate("/services")}
+              className="group flex items-center gap-3 text-xs font-bold tracking-[0.3em] uppercase opacity-70 hover:opacity-100 transition-all"
+            >
+              <ArrowLeft className="w-4 h-4 group-hover:-translate-x-2 transition-transform" />
+              Regresar
+            </button>
+          </div>
           Diseño <span className="text-gold">Custom</span>
         </h1>
-        <p className="text-steel text-lg max-w-xl mx-auto">
+        <p className="text-ice/50 text-lg max-w-xl mx-auto">
           Rompe los moldes. Tu visión, nuestras herramientas. Crea una pieza
           única desde cero.
         </p>
@@ -208,14 +217,16 @@ export default function CustomService() {
 
             {/* Grid de Prendas */}
             <div className="space-y-4">
-              <label className="text-sm text-steel uppercase tracking-widest font-bold">
+              <label className="text-sm text-ice/40 uppercase tracking-widest font-bold">
                 Selecciona Prenda
               </label>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {garments.map((garment) => (
                   <div
                     key={garment.idGarment}
-                    onClick={() => handleSelection("idGarment", garment.idGarment)}
+                    onClick={() =>
+                      handleSelection("idGarment", garment.idGarment)
+                    }
                     className={`
                       cursor-pointer rounded-2xl p-4 flex flex-col items-center justify-center gap-3
                       border transition-all duration-300 relative overflow-hidden group
@@ -228,7 +239,7 @@ export default function CustomService() {
                   >
                     <div className="w-20 h-20 rounded-lg overflow-hidden mb-1 bg-black/20">
                       <img
-                        src={getDisplayImageUrl(  garment.imageUrl)}
+                        src={getDisplayImageUrl(garment.imageUrl)}
                         alt={garment.garmentName}
                         className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
                         onError={(e) => {
@@ -238,11 +249,20 @@ export default function CustomService() {
                       />
                     </div>
                     <div className="text-center z-10">
-                        <p className={`font-bold text-sm leading-tight ${formData.idGarment === garment.idGarment ? "text-gold" : "text-primary"}`}>
-                          {garment.garmentName} {/* DTO: GarmentName */}
-                        </p>
-                        <p className="text-xs text-steel mt-1">${garment.price.toLocaleString()}</p> {/* DTO: Price */}
-                      </div>
+                      <p
+                        className={`font-bold text-sm leading-tight ${
+                          formData.idGarment === garment.idGarment
+                            ? "text-gold"
+                            : "text-primary"
+                        }`}
+                      >
+                        {garment.garmentName} {/* DTO: GarmentName */}
+                      </p>
+                      <p className="text-xs text-steel mt-1">
+                        ${garment.price.toLocaleString()}
+                      </p>{" "}
+                      {/* DTO: Price */}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -250,14 +270,16 @@ export default function CustomService() {
 
             {/* Grid de Servicios */}
             <div className="space-y-4 mt-8">
-              <label className="text-sm text-steel uppercase tracking-widest font-bold">
+              <label className="text-sm text-ice/40 uppercase tracking-widest font-bold">
                 Selecciona Técnica
               </label>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {services.map((service) => (
                   <div
                     key={service.idService}
-                    onClick={() => handleSelection("idService", service.idService)}
+                    onClick={() =>
+                      handleSelection("idService", service.idService)
+                    }
                     className={`
                       cursor-pointer rounded-2xl p-5 flex items-start gap-4
                       border transition-all duration-300
@@ -282,10 +304,19 @@ export default function CustomService() {
                       )}
                     </div>
                     <div>
-                        <p className="font-bold text-lg leading-tight">{service.serviceName}</p> {/* DTO: ServiceName */}
-                        <p className="text-sm text-steel mb-2 line-clamp-2">{service.serviceDetails}</p> {/* DTO: ServiceDetails */}
-                        <p className="text-xs font-mono text-gold/80">+ ${service.servicePrice.toLocaleString()}</p> {/* DTO: ServicePrice */}
-                      </div>
+                      <p className="font-bold text-lg leading-tight">
+                        {service.serviceName}
+                      </p>{" "}
+                      {/* DTO: ServiceName */}
+                      <p className="text-sm text-ice/60 mb-2 line-clamp-2">
+                        {service.serviceDetails}
+                      </p>{" "}
+                      {/* DTO: ServiceDetails */}
+                      <p className="text-xs font-mono text-gold/80">
+                        + ${service.servicePrice.toLocaleString()}
+                      </p>{" "}
+                      {/* DTO: ServicePrice */}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -306,7 +337,7 @@ export default function CustomService() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {/* Color */}
               <div className="space-y-2 group">
-                <label className="text-sm text-steel font-bold flex items-center gap-2">
+                <label className="text-sm text-ice/60 font-bold flex items-center gap-2">
                   <Palette size={16} /> Color
                 </label>
                 <input
@@ -315,13 +346,13 @@ export default function CustomService() {
                   placeholder="Ej: Verde Pastel, Negro Mate"
                   value={formData.selectedColor}
                   onChange={handleInputChange}
-                  className="w-full bg-graphite/40 border border-steel/30 rounded-xl px-4 py-3 text-primary focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold transition-all placeholder:text-steel/50"
+                  className="w-full bg-graphite/40 border border-steel/30 rounded-xl px-4 py-3 text-primary focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold transition-all placeholder:text-steel/100"
                 />
               </div>
 
               {/* Talle */}
               <div className="space-y-2">
-                <label className="text-sm text-steel font-bold flex items-center gap-2">
+                <label className="text-sm text-ice/60 font-bold flex items-center gap-2">
                   <Scissors size={16} /> Talle / Medidas
                 </label>
                 <input
@@ -330,13 +361,13 @@ export default function CustomService() {
                   placeholder="Ej: XXL, Oversized, A medida"
                   value={formData.selectedSize}
                   onChange={handleInputChange}
-                  className="w-full bg-graphite/40 border border-steel/30 rounded-xl px-4 py-3 text-primary focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold transition-all placeholder:text-steel/50"
+                  className="w-full bg-graphite/40 border border-steel/30 rounded-xl px-4 py-3 text-primary focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold transition-all placeholder:text-steel/100"
                 />
               </div>
 
               {/* Cantidad */}
               <div className="space-y-2">
-                <label className="text-sm text-steel font-bold flex items-center gap-2">
+                <label className="text-sm text-ice/60 font-bold flex items-center gap-2">
                   <Calculator size={16} /> Cantidad
                 </label>
                 <input
@@ -350,7 +381,7 @@ export default function CustomService() {
                       count: parseInt(e.target.value) || 1,
                     })
                   }
-                  className="w-full bg-graphite/40 border border-steel/30 rounded-xl px-4 py-3 text-primary focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold transition-all"
+                  className="w-full bg-graphite/40 border border-steel/50 rounded-xl px-4 py-3 text-primary focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold transition-all"
                 />
               </div>
             </div>
@@ -384,7 +415,7 @@ export default function CustomService() {
                   <p className="text-lg font-medium">
                     Arrastra tus diseños o haz click aquí
                   </p>
-                  <p className="text-steel text-sm mt-1">
+                  <p className="text-ice/60 text-sm mt-1">
                     Soporta PNG, JPG, AI, PDF (Máx 10MB)
                   </p>
                 </div>
@@ -417,7 +448,7 @@ export default function CustomService() {
 
             {/* Detalles Texto */}
             <div className="space-y-2">
-              <label className="text-sm text-steel font-bold">
+              <label className="text-sm text-ice/40 uppercase tracking-widest font-bold">
                 Detalles Adicionales
               </label>
               <textarea
@@ -426,7 +457,7 @@ export default function CustomService() {
                 onChange={handleInputChange}
                 rows={4}
                 placeholder="Describe tu idea con precisión: ubicación del logo, tamaño específico en cm, referencias..."
-                className="w-full bg-graphite/40 border border-steel/30 rounded-xl px-4 py-3 text-primary focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold transition-all placeholder:text-steel/50 resize-none"
+                className="w-full bg-graphite/40 border border-steel/30 rounded-xl px-4 py-3 text-primary focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold transition-all placeholder:text-steel/100 resize-none"
               />
             </div>
           </section>
@@ -440,19 +471,21 @@ export default function CustomService() {
             </h3>
 
             <div className="space-y-4 mb-8">
-              <div className="flex justify-between text-steel">
+              <div className="flex justify-between text-ice/60">
                 <span>Prenda Base</span>
                 <span className="text-ice">
-                  {garments.find(g => g.idGarment === formData.idGarment)?.garmentName || "-"}
+                  {garments.find((g) => g.idGarment === formData.idGarment)
+                    ?.garmentName || "-"}
                 </span>
               </div>
-              <div className="flex justify-between text-steel">
+              <div className="flex justify-between text-ice/60">
                 <span>Técnica</span>
                 <span className="text-ice">
-                  {services.find(s => s.idService === formData.idService)?.serviceName || "-"}
+                  {services.find((s) => s.idService === formData.idService)
+                    ?.serviceName || "-"}
                 </span>
               </div>
-              <div className="flex justify-between text-steel">
+              <div className="flex justify-between text-ice/60">
                 <span>Cantidad</span>
                 <span className="text-ice">x{formData.count}</span>
               </div>
@@ -463,7 +496,7 @@ export default function CustomService() {
                   ${customTotal.toLocaleString()}
                 </span>
               </div>
-              <p className="text-xs text-steel mt-2 text-right">
+              <p className="text-xs text-ice/60 mt-2 text-right">
                 *El precio final puede variar según complejidad del diseño tras
                 revisión.
               </p>

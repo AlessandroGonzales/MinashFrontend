@@ -1,11 +1,20 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, ShoppingCart } from "lucide-react";
-import { toastSuccess, toastError } from "../Utils/toast";
+import {
+  ArrowLeft,
+  ShoppingCart,
+  Plus,
+  Minus,
+  Info,
+  Layers,
+} from "lucide-react";
+import { toastSuccess, toastError, toastInfo } from "../Utils/toast";
 import { getGarmentServiceById } from "../services/authService";
 import { useCart } from "../context/CartContext";
 import { createDetailsOrder } from "../services/authService";
 import { getDisplayImageUrl } from "../Utils/ImageUtils";
+import { useAuth } from "../context/AuthContext";
+import AuthModal from "../components/auth/AuthModal";
 
 const FullServiceDetails = () => {
   const { id } = useParams();
@@ -18,8 +27,8 @@ const FullServiceDetails = () => {
   const [details, setDetails] = useState("");
   const [selectedColor, setSelectedColor] = useState("");
   const [selectedSize, setSelectesSize] = useState("");
-
- 
+  const {  isAuthenticated } = useAuth();
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
   useEffect(() => {
     const fetchService = async () => {
@@ -42,14 +51,17 @@ const FullServiceDetails = () => {
       } finally {
         setLoading(false);
       }
-
-      console.log("ID del servicio:", id);
     };
-
     fetchService();
   }, [id, navigate]);
 
   const handleAddToCart = async () => {
+    if (!isAuthenticated) {
+      setShowAuthModal(true);
+      toastInfo("Debes iniciar sesión para realizar la compra");
+      return;
+    }
+
     if (!selectedColor) {
       toastError("Selecciona un color");
       return;
@@ -58,8 +70,8 @@ const FullServiceDetails = () => {
     const detailsOrderRequest = {
       count: quantity,
       selectedColor,
-      selectedSize, 
-      details, 
+      selectedSize,
+      details,
       idService: null,
       idGarmentService: id,
     };
@@ -74,10 +86,8 @@ const FullServiceDetails = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen pt-20 px-6 flex items-center justify-center">
-        <div className="animate-pulse text-ice text-2xl">
-          Cargando detalle...
-        </div>
+      <div className="min-h-screen flex items-center justify-center bg-blackDeep font-['Satoshi']">
+        <div className="w-10 h-10 border-2 border-gold/20 border-t-gold rounded-full animate-spin"></div>
       </div>
     );
   }
@@ -86,137 +96,179 @@ const FullServiceDetails = () => {
   const totalPrice = (service.addtionalPrice || 0) * quantity;
 
   return (
-    <div className="min-h-screen pt-12 pb-20 px-6 md:px-12 lg:px-32">
-      <button
-        onClick={() => navigate("/fullServices")}
-        className="flex items-center gap-2 text-ice/70 hover:text-gold transition mb-8 text-lg"
-      >
-        <ArrowLeft className="w-6 h-6" />
-        Volver a servicios
-      </button>
+    <div className="min-h-screen bg-blackDeep text-ice font-['Satoshi'] selection:bg-gold/30 pb-20">
+      {/* Botón Volver */}
+      <div className="max-w-7xl mx-auto px-6 pt-10">
+        <button
+          onClick={() => navigate("/fullServices")}
+          className="group flex items-center gap-3 text-xs font-bold tracking-[0.3em] uppercase opacity-70 hover:opacity-100 transition-all"
+        >
+          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-2 transition-transform" />
+          Regresar
+        </button>
+      </div>
 
-      <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12">
-        {/* Imagen */}
-        <div className="relative rounded-2xl overflow-hidden shadow-2xl">
-          {service.imageUrl ? (
-            <img
-              src={getDisplayImageUrl(service.imageUrl[0])}
-              alt={service.garmentServiceName}
-              className="w-full min-h-min object-cover max-h-96 lg:max-h-full"
-            />
-          ) : (
-            <div className="bg-steel/30 h-96 flex items-center justify-center">
-              <span className="text-gold text-8xl font-bold opacity-40">M</span>
+      <main className="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-12 gap-16 mt-12">
+        {/* Columna Izquierda: Visualizador de Imagen */}
+        <div className="lg:col-span-7">
+          <div className="sticky top-10">
+            <div className="relative group rounded-[2.5rem] overflow-hidden bg-graphite  shadow-2xl">
+              {service.imageUrl ? (
+                <img
+                  src={getDisplayImageUrl(service.imageUrl[0])}
+                  alt={service.garmentServiceName}
+                  className="w-full object-cover aspect-[4/5] lg:h-[75vh] group-hover:scale-105 transition-transform duration-1000"
+                />
+              ) : (
+                <div className="aspect-[4/5] flex items-center justify-center">
+                  <Layers className="w-20 h-20 text-gold/10" />
+                </div>
+              )}
+              {/* Overlay Futurista */}
+              <div className="absolute inset-0 bg-gradient-to-t from-blackDeep/80 via-transparent to-transparent opacity-60"></div>
+              <div className="absolute bottom-10 left-10">
+                <span className="bg-gold/90 text-blackDeep text-[10px] font-black px-3 py-1 rounded-full tracking-[0.2em] uppercase">
+                  Full Service
+                </span>
+              </div>
             </div>
-          )}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+          </div>
         </div>
 
-        {/* Detalles y formulario */}
-        <div className="flex flex-col justify-center">
-          <h1 className="text-4xl md:text-5xl font-bold text-ice mb-6">
-            {service.garmentServiceName}
-          </h1>
+        {/* Columna Derecha: Configuración */}
+        <div className="lg:col-span-5">
+          <header className="mb-12">
+            <h1 className="text-5xl lg:text-5xl  tracking-tighter uppercase leading-none mb-6">
+              {service.garmentServiceName}
+            </h1>
+            <p className="text-ice/70 text-lg font-light leading-relaxed">
+              {service.garmentServiceDetails || service.description}
+            </p>
+          </header>
 
-          <p className="text-ice/80 text-lg leading-relaxed mb-8">
-            {service.garmentServiceDetails || service.description}
-          </p>
-
-          <div className="bg-graphite border border-steel/50 rounded-2xl p-8 space-y-8">
-            {/* Precio base */}
-            <div>
-              <span className="text-ice/70 text-lg">Precio por unidad:</span>
-              <span className="text-gold text-xl font-bold ml-3">
-                ${service.addtionalPrice || "Consultar"}
-              </span>
+          <div className="space-y-12">
+            {/* Selector de Talle */}
+            <div className="space-y-5">
+              <label className="text-[10px] font-bold tracking-[0.3em] uppercase opacity-70">
+                Talla Disponible
+              </label>
+              <div className="flex flex-wrap gap-3">
+                {service.sizes?.map((size, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setSelectesSize(size)}
+                    className={`min-w-[50px] h-[50px] rounded-xl border text-sm font-bold transition-all duration-300 ${
+                      selectedSize === size
+                        ? "bg-ice text-blackDeep border-ice"
+                        : "border-white/10 hover:border-gold/50 text-ice/60"
+                    }`}
+                  >
+                    {size}
+                  </button>
+                ))}
+              </div>
             </div>
 
-            {/* Selección de color */}
-            <div>
-              <label className="text-ice font-medium mb-3 block">
-                Color de la prenda
+            {/* Selector de Color */}
+            <div className="space-y-5">
+              <label className="text-[10px] font-bold tracking-[0.3em] uppercase opacity-70">
+                Paleta de Color
               </label>
-              <select
-                value={selectedColor}
-                onChange={(e) => setSelectedColor(e.target.value)}
-                className="w-full bg-blackDeep border border-steel/70 rounded-xl px-5 py-4 text-ice focus:outline-none focus:border-gold/70 transition"
-              >
-                <option value="">Seleccione un color</option>
+              <div className="flex flex-wrap gap-3">
                 {service.colors?.map((color, index) => (
-                  <option key={index} value={color}>
+                  <button
+                    key={index}
+                    onClick={() => setSelectedColor(color)}
+                    className={`px-6 py-3 rounded-xl border text-xs font-bold uppercase tracking-widest transition-all duration-300 ${
+                      selectedColor === color
+                        ? "bg-gold text-blackDeep border-gold shadow-[0_10px_20px_rgba(212,175,55,0.2)]"
+                        : "border-white/10 hover:border-gold/50 text-ice/60"
+                    }`}
+                  >
                     {color}
-                  </option>
+                  </button>
                 ))}
-              </select>
+              </div>
             </div>
 
-             <div>
-              <label className="text-ice font-medium mb-3 block">
-                Talle de la prenda
-              </label>
-              <select
-                value={selectedSize}
-                onChange={(e) => setSelectesSize(e.target.value)}
-                className="w-full bg-blackDeep border border-steel/70 rounded-xl px-5 py-4 text-ice focus:outline-none focus:border-gold/70 transition"
-              >
-                <option value="">Seleccione un color</option>
-                {service.sizes?.map((sizes, index) => (
-                  <option key={index} value={sizes}>
-                    {sizes}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Cantidad */}
-            <div>
-              <label className="text-ice font-medium mb-3 block">
-                Cantidad
-              </label>
-              <input
-                type="number"
-                min="1"
-                value={quantity}
-                onChange={(e) =>
-                  setQuantity(Math.max(1, parseInt(e.target.value) || 1))
-                }
-                className="w-full bg-blackDeep border border-steel/70 rounded-xl px-5 py-4 text-ice focus:outline-none focus:border-gold/70 transition"
-              />
-            </div>
-
-            {/* Total */}
-            <div className="pt-6 border-t border-steel/50">
-              <div className="flex justify-between items-center">
-                <span className="text-xl text-ice font-semibold">Total:</span>
-                <span className="text-gold text-xl font-bold">
-                  ${totalPrice.toFixed(2)}
+            {/* Cantidad y Precio */}
+            <div className="flex items-center justify-between py-10 border-y border-white/5">
+              <div className="space-y-4">
+                <label className="text-[10px] font-bold tracking-[0.3em] uppercase opacity-70 block">
+                  Cantidad
+                </label>
+                <div className="flex items-center bg-white/5 rounded-2xl p-1 border border-white/5">
+                  <button
+                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                    className="w-10 h-10 flex items-center justify-center hover:text-gold transition-colors"
+                  >
+                    <Minus className="w-4 h-4" />
+                  </button>
+                  <span className="px-6 text-xl font-medium min-w-[3rem] text-center">
+                    {quantity}
+                  </span>
+                  <button
+                    onClick={() => setQuantity(quantity + 1)}
+                    className="w-10 h-10 flex items-center justify-center hover:text-gold transition-colors"
+                  >
+                    <Plus className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+              <div className="text-right">
+                <label className="text-[10px] font-bold tracking-[0.3em] uppercase opacity-70 block mb-4">
+                  Precio Unitario
+                </label>
+                <span className="text-3xl font-light">
+                  ${service.addtionalPrice?.toLocaleString()}
                 </span>
               </div>
             </div>
 
-            {/* Botón añadir al carrito */}
-            <button
-              onClick={handleAddToCart}
-              className="w-full py-3 rounded-xl bg-gold text-black font-bold text-lg uppercase hover:opacity-90 transition flex items-center justify-center gap-3 shadow-lg"
-            >
-              <ShoppingCart className="w-6 h-6" />
-              Añadir al carrito
-            </button>
-            <div>
-              <label className="text-ice font-medium mb-3 block">
-                Detalles adicionales
+            {/* Notas Adicionales */}
+            <div className="space-y-4">
+              <label className="flex items-center gap-2 text-[10px] font-bold tracking-[0.3em] uppercase opacity-70">
+                <Info className="w-3 h-3" /> Especificaciones del encargo
               </label>
               <textarea
                 value={details}
                 onChange={(e) => setDetails(e.target.value)}
-                placeholder="Ej: impresión frontal, tamaño A4, ubicación centrada..."
-                className="w-full bg-blackDeep border border-steel/70 rounded-xl px-5 py-4 text-ice focus:outline-none focus:border-gold/70 transition resize-none"
-                rows={4}
+                placeholder="Ej: Logo en espalda, hilos dorados..."
+                rows={3}
+                className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-5 text-ice placeholder:opacity-60 focus:outline-none focus:border-gold/50 transition-all resize-none"
               />
+            </div>
+
+            {/* Acción Final */}
+            <div className="pt-4">
+              <div className="flex justify-between items-end mb-8">
+                <span className="text-xs opacity-40 uppercase tracking-widest font-bold">
+                  Inversión Total
+                </span>
+                <span className="text-4xl  tracking-tighter text-gold">
+                  $
+                  {totalPrice.toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                  })}
+                </span>
+              </div>
+
+              <button
+                onClick={handleAddToCart}
+                className="group relative w-full h-14 bg-gold rounded-2xl overflow-hidden shadow-[0_20px_40px_rgba(212,175,55,0.15)] hover:shadow-[0_20px_40px_rgba(212,175,55,0.25)] transition-all duration-500"
+              >
+                <div className="relative z-10 flex items-center justify-center gap-4 text-blackDeep font-black uppercase tracking-[0.2em] text-sm">
+                  <ShoppingCart className="w-5 h-5 group-hover:rotate-12 transition-transform" />
+                  Confirmar Selección
+                </div>
+                <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500"></div>
+              </button>
             </div>
           </div>
         </div>
-      </div>
+      </main>
+      {showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} />}
+      
     </div>
   );
 };

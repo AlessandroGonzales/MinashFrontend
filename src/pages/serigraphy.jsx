@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
 import { Search, Filter, X } from "lucide-react";
 import { getAllServices, getServicesByQuality } from "../services/authService";
-import { toastError, toastInfo } from "../Utils/toast";
-import { useAuth } from "../context/AuthContext";
+import { toastError } from "../Utils/toast";
 import AuthModal from "../components/auth/AuthModal";
 import { useNavigate } from "react-router-dom";
 import { getDisplayImageUrl } from "../Utils/ImageUtils";
@@ -12,9 +11,6 @@ const Services = () => {
   const [filteredServices, setFilteredServices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [showSerigraphyModal, setShowSerigraphyModal] = useState(false);
-  const { user, isAuthenticated } = useAuth();
-  const [showAuthModal, setShowAuthModal] = useState(false);
   const navigate = useNavigate();
 
   // Filtros
@@ -173,25 +169,9 @@ const Services = () => {
     </div>
   );
 
-  const serigraphyStorageKey = user
-    ? `serigraphy_warning_accepted_user_${user.iduser}`
-    : null;
 
   const handleBuyClick = (idService) => {
-    if (!isAuthenticated) {
-      setShowAuthModal(true);
-      toastInfo("Debes iniciar sesión para realizar la compra");
-      return;
-    }
-
-    const alreadyAccepted = localStorage.getItem(serigraphyStorageKey);
-
-    if (!alreadyAccepted) {
-      setShowSerigraphyModal(true);
-      sessionStorage.setItem("pendingService", JSON.stringify(services));
-      return;
-    }
-
+    
     navigate(`/serigraphy/${idService}`);
   };
 
@@ -347,53 +327,8 @@ const Services = () => {
           </div>
         )}
       </div>
-      {showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} />}
 
-      {showSerigraphyModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-blackDeep/80">
-          <div className="bg-graphite/50 backdrop-blur-xl rounded-3xl p-10 max-w-lg mx-6 shadow-2xl border border-steel/30">
-            <h3 className="text-3xl font-bold text-gold mb-6 tracking-tight">
-              Aviso importante
-            </h3>
-
-            <p className="text-ice/90 text-base leading-relaxed mb-8">
-              Al continuar con la compra del servicio de{" "}
-              <strong>serigrafía</strong>, usted estará abonando únicamente la
-              técnica aplicada.
-              <br />
-              <br />
-              <strong>La prenda no está incluida</strong>. El cliente deberá
-              proporcionar las prendas sobre las cuales se realizará el
-              servicio.
-              <br />
-              <br />
-              Esta modalidad permite ofrecer un precio más accesible, ya que se
-              cobra exclusivamente el proceso técnico.
-            </p>
-
-            <div className="flex justify-end gap-4">
-              <button
-                onClick={() => {
-                  setShowSerigraphyModal(false);
-                }}
-                className="px-6 py-3 rounded-3xl text-sm  border border-steel/50 text-ice/70 hover:text-primary hover:border-steel transition-all duration-500"
-              >
-                Cancelar
-              </button>
-
-              <button
-                onClick={() => {
-                  localStorage.setItem(serigraphyStorageKey, "true");
-                  setShowSerigraphyModal(false);
-                }}
-                className="px-1 py-1  text-sm rounded-3xl bg-gold/90 text-blackDeep font-bold hover:bg-gold transition-all duration-500"
-              >
-                Entendido, continuar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      
     </div>
   );
 };

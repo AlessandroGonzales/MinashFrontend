@@ -40,7 +40,7 @@ export default function Services() {
         <h1 className="text-4xl md:text-4xl lg:text-6xl font-satoshi font-bold ">
           Nuestros <span className="text-gold">Servicios</span>
         </h1>
-        <p className="mt-6 text-steel text-lg md:text-xl max-w-2xl mx-auto">
+        <p className="mt-6 text-ice/60 text-lg md:text-xl max-w-2xl mx-auto">
           Dos caminos. Un objetivo: llevar tu prenda al siguiente nivel.
         </p>
       </div>
@@ -131,7 +131,7 @@ export default function Services() {
       </div>
 
       {/* Texto inferior opcional */}
-      <div className="text-center mt-16 md:mt-24 text-steel text-sm md:text-base">
+      <div className="text-center mt-12 md:mt-14 text-ice/60 text-sm md:text-base">
         Personaliza tus prendas con serigrafía de alta calidad • 2026
       </div>
     </div>

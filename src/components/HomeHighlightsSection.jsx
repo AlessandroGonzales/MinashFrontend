@@ -1,9 +1,38 @@
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
+import { ArrowUpRight } from "lucide-react";
+
+const GalleryItem = ({ src, alt, title, subtitle, className }) => (
+  <motion.div
+    initial={{ opacity: 0, scale: 0.9 }}
+    whileInView={{ opacity: 1, scale: 1 }}
+    viewport={{ once: true, margin: "-50px" }}
+    transition={{ duration: 0.5 }}
+    className={`group relative overflow-hidden rounded-3xl border border-white/10 ${className}`}
+  >
+    <img
+      src={src}
+      alt={alt}
+      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+      loading="lazy"
+    />
+    {/* Overlay Gradiente */}
+    <div className="absolute inset-0 bg-gradient-to-t from-blackDeep/90 via-transparent to-transparent opacity-80" />
+
+    {/* Texto Flotante */}
+    <div className="absolute bottom-0 left-0 p-6 translate-y-2 group-hover:translate-y-0 transition-transform duration-500">
+      <p className="text-gold text-[10px] uppercase tracking-[0.2em] font-bold mb-1">
+        {subtitle}
+      </p>
+      <p className="text-white text-lg font-bold leading-tight">{title}</p>
+    </div>
+  </motion.div>
+);
 
 export default function HomeHighlightsSection() {
   return (
-    <section className="relative w-full bg-blackDeep text-primary py-24 px-6 sm:px-12 lg:px-20 overflow-hidden">
+    <section className="relative w-full bg-blackDeep text-primary py-24 px-6 sm:px-12 lg:px-20 overflow-hidden font-['Satoshi']">
       {/* ================= DIFERENCIACIÓN ================= */}
       <div className="max-w-7xl mx-auto text-center mb-28">
         <motion.h2
@@ -29,7 +58,7 @@ export default function HomeHighlightsSection() {
         </motion.p>
       </div>
 
-      {/* ================= SERVICIO ESTRELLA ================= */}
+      {/* ================= SERVICIO ESTRELLA (CUSTOM) ================= */}
       <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center mb-32">
         <motion.div
           initial={{ opacity: 0, x: -40 }}
@@ -40,21 +69,26 @@ export default function HomeHighlightsSection() {
           <h3 className="text-gold text-sm uppercase tracking-widest mb-4">
             Servicio más popular
           </h3>
+
           <h2 className="text-4xl sm:text-5xl font-extrabold mb-6">
             El Custom
           </h2>
+
           <p className="text-ice text-base sm:text-lg leading-relaxed mb-8 max-w-xl">
             Haz realidad tus ideas en tus prendas favoritas. Convertimos
             conceptos en piezas únicas que reflejan identidad, actitud y estilo
             propio.
           </p>
 
-          <button className="px-10 py-4 border border-gold text-gold font-semibold rounded-md hover:bg-gold/10 transition">
-            Quiero mi custom
-          </button>
+          <Link to="/custom">
+            <button className="px-6 py-3 rounded-md text-sm uppercase bg-transparent border border-gold text-gold hover:bg-gold/10 transition">
+              Quiero mi custom
+            </button>
+          </Link>
         </motion.div>
 
         {/* Imagen destacada del custom (placeholder) */}
+
         <motion.div
           initial={{ opacity: 0, x: 40 }}
           whileInView={{ opacity: 1, x: 0 }}
@@ -66,61 +100,72 @@ export default function HomeHighlightsSection() {
             src="src/assets/mascotas.webp"
             alt="Servicio Custom"
             className="w-full h-full object-cover"
+            loading="lazy"
           />
+
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
         </motion.div>
       </div>
 
-      {/* ================= COLLAGE CLIENTES ================= */}
+      {/* ================= COLLAGE CLIENTES (BENTO GRID) ================= */}
       <div className="max-w-7xl mx-auto">
-        <motion.h3
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="text-center text-3xl sm:text-4xl font-extrabold mb-12"
-        >
-          Clientes que ya lo vivieron
-        </motion.h3>
-
-        {/* MOBILE: layout simple */}
-        <div className="flex flex-col items-center gap-6 sm:hidden">
-          {["childrens.jpg", "shirt.jpg", "love.jpg", "family.jpg"].map(
-            (img, i) => (
-              <img
-                key={i}
-                src={`src/assets/${img}`}
-                alt={`Cliente ${i + 1}`}
-                className="w-64 rounded-xl shadow-lg"
-              />
-            )
-          )}
+        <div className="flex flex-col md:flex-row justify-between  mb-12 px-2">
+          <motion.h3
+            initial={{ opacity: 0, x: -20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            className="text-3xl sm:text-5xl font-black text-white tracking-tight"
+          >
+            Resultados
+          </motion.h3>
+          <p className="text-ice/60 text-sm font-mono pt-4 md:mt-0 uppercase tracking-widest ">
+            Galería de clientes verificada
+          </p>
         </div>
 
-        {/* DESKTOP: collage artístico */}
-        <div className="relative w-full h-[740px] hidden sm:block">
-          <img
+        {/* BENTO GRID LAYOUT 
+            Mobile: 1 columna o 2 columnas pequeñas
+            Desktop: Grid compleja asimétrica
+        */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 auto-rows-[250px] md:auto-rows-[300px]">
+          {/* Item 1: Destacado Grande (Vertical en desktop) */}
+          <GalleryItem
             src="src/assets/childrens.jpg"
-            alt="Cliente 1"
-            className="absolute top-10 left-5 w-56 lg:w-64 rounded-xl shadow-lg rotate-[-4deg]"
+            alt="Niños"
+            title="Kids Collection"
+            subtitle="Suavidad & Color"
+            className="col-span-2 row-span-2 md:col-span-2 md:row-span-2"
+            loading="lazy"
           />
 
-          <img
+          {/* Item 2: Horizontal */}
+          <GalleryItem
             src="src/assets/shirt.jpg"
-            alt="Cliente 2"
-            className="absolute top-20 right-1 w-60 lg:w-72 rounded-xl shadow-lg "
+            alt="Camiseta detalle"
+            title="High Detail"
+            subtitle="Definición"
+            className="col-span-2 md:col-span-2 md:row-span-1"
+            loading="lazy"
+
           />
 
-          <img
+          {/* Item 3: Cuadrado */}
+          <GalleryItem
             src="src/assets/love.jpg"
-            alt="Cliente 3"
-            className="absolute bottom-20 left-1/4 w-64 lg:w-80 rounded-xl shadow-lg rotate-[2deg]"
+            alt="Pareja"
+            title="Duo Sets"
+            subtitle="Matching"
+            className="col-span-1 md:col-span-1 md:row-span-1"
+            loading="lazy"
           />
 
-          <img
+          {/* Item 4: Cuadrado */}
+          <GalleryItem
             src="src/assets/family.jpg"
-            alt="Cliente 4"
-            className="absolute bottom-2 right-28 w-56 lg:w-64 rounded-xl shadow-lg rotate-[2deg]"
+            alt="Familia"
+            title="Family Packs"
+            subtitle="Unión"
+            className="col-span-1 md:col-span-1 md:row-span-1"
+            loading="lazy"
           />
         </div>
       </div>

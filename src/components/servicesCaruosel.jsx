@@ -5,11 +5,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { getDisplayImageUrl } from "../Utils/ImageUtils";
 import useFetchServices from "../hooks/useFetchServices";
+import { Link } from "react-router-dom";
 
 // Tarjeta de cada servicio
 const ServiceCard = ({ service }) => {
   if (!service)
     return <div className="hidden sm:block flex-1 bg-gray-900/50"></div>;
+
 
   const baseClasses =
     "relative w-full h-full overflow-hidden transition-all duration-500 ease-in-out cursor-pointer";
@@ -17,6 +19,7 @@ const ServiceCard = ({ service }) => {
   const contentClasses =
     "absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent flex flex-col justify-end p-8 sm:p-12 text-white";
 
+ 
   return (
     <motion.div
       key={service?.idGarmentService}
@@ -43,10 +46,12 @@ const ServiceCard = ({ service }) => {
         </p>
 
         <div className="flex gap-4">
-          <button className="px-6 py-3 rounded-md text-sm uppercase bg-transparent border border-gold text-gold hover:bg-gold/10 transition">
+          <Link to="/fullServices">
+          <button className="px-5 py-3 rounded-md text-xs uppercase bg-transparent border border-gold text-gold hover:bg-gold/10 transition">
             SABER MAS
           </button>
-          <button className="px-6 py-3 rounded-md text-sm uppercase bg-transparent border border-gold text-gold hover:bg-gold/10 transition">
+          </Link>
+          <button className="px-5 py-3 rounded-md text-xs uppercase bg-transparent border border-gold text-gold hover:bg-gold/10 transition">
             SOLICITAR
           </button>
         </div>
