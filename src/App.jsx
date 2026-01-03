@@ -19,9 +19,10 @@ import Serigraphy from "./pages/serigraphy";
 import ServiceDetail from "./pages/ServiceDetail";
 import Cart from "./pages/cart/cart";
 import FullServices from "./pages/FullService";
-import FullServiceDetails from "./pages/FullServiceDetails"
+import FullServiceDetails from "./pages/FullServiceDetails";
 import CustomService from "./pages/custom";
 import NotFound from "./pages/NotFound";
+import ScrollToTop from "./ScrollToTop";
 
 // Pages privadas
 import Profile from "./pages/user/Profile";
@@ -29,6 +30,7 @@ import Profile from "./pages/user/Profile";
 export default function App() {
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <div className="bg-blackDeep min-h-screen text-primary">
         <Navbar />
 
@@ -36,15 +38,15 @@ export default function App() {
           <Routes>
             {/* 🌍 RUTAS PÚBLICAS */}
             <Route path="/" element={<Home />} />
-            <Route path="*" element={<NotFound />}/>
+            <Route path="*" element={<NotFound />} />
             <Route path="/services" element={<Servicios />} />
             <Route path="/serigraphy" element={<Serigraphy />} />
             <Route path="/contact" element={<Contacto />} />
             <Route path="/login" element={<Login />} />
             <Route path="/serigraphy/:id" element={<ServiceDetail />} />
-            <Route path="/fullServices" element={<FullServices/>} />
-            <Route path="/fullServices/:id" element={<FullServiceDetails/>}/>
-            <Route path="/custom" element={<CustomService />}/>
+            <Route path="/fullServices" element={<FullServices />} />
+            <Route path="/fullServices/:id" element={<FullServiceDetails />} />
+            <Route path="/custom" element={<CustomService />} />
 
             {/* 🔐 RUTAS PRIVADAS (cualquier usuario logueado) */}
             <Route

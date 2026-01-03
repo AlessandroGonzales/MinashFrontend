@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { Search, Filter, X } from "lucide-react";
 import { getAllServices, getServicesByQuality } from "../services/authService";
 import { toastError } from "../Utils/toast";
-import AuthModal from "../components/auth/AuthModal";
 import { useNavigate } from "react-router-dom";
 import { getDisplayImageUrl } from "../Utils/ImageUtils";
 

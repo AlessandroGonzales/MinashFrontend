@@ -6,9 +6,12 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { getDisplayImageUrl } from "../Utils/ImageUtils";
 import useFetchServices from "../hooks/useFetchServices";
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 // Tarjeta de cada servicio
 const ServiceCard = ({ service }) => {
+  const navigate = useNavigate();
+
   if (!service)
     return <div className="hidden sm:block flex-1 bg-gray-900/50"></div>;
 
@@ -51,7 +54,7 @@ const ServiceCard = ({ service }) => {
             SABER MAS
           </button>
           </Link>
-          <button className="px-5 py-3 rounded-md text-xs uppercase bg-transparent border border-gold text-gold hover:bg-gold/10 transition">
+          <button className="px-5 py-3 rounded-md text-xs uppercase bg-transparent border border-gold text-gold hover:bg-gold/10 transition" onClick={() => { navigate(`/fullServices/${service.idGarmentService}`)}}>
             SOLICITAR
           </button>
         </div>
