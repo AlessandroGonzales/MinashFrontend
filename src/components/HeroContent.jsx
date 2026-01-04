@@ -12,7 +12,7 @@ export default function HeroContent() {
         MINASH SportWear
       </h1>
 
-      <p className="max-w-2xl mt-4 text-lg sm:text-xl text-ice/90">
+      <p className="max-w-2xl mt-4 text-lg sm:text-xl text-ice">
         Serigrafía, estampado, sublimado y bordado profesional. Transformamos tus ideas en prendas con calidad premium.
       </p>
 

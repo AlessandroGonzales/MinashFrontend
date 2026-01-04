@@ -2,21 +2,20 @@ import { useEffect, useState, useRef } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { getUserProfile } from "../../services/authService";
 import { useNavigate } from "react-router-dom";
-import { getDisplayImageUrl } from "../../Utils/ImageUtils"; // Asegúrate que la ruta sea correcta (mayúsculas/minúsculas)
+import { getDisplayImageUrl } from "../../Utils/ImageUtils"; 
 import { patchUserField } from "../../services/authService";
 import { toastSuccess, toastError, toastBye } from "../../Utils/toast";
 import { Camera, Edit2, LogOut, User, MapPin, ChevronRight, Save, X, Loader2 } from "lucide-react";
 
 export default function Profile() {
   const { user: authUser, logout, updateUser } = useAuth();
-  const navigate = useNavigate();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [formData, setFormData] = useState({});
   const [editingField, setEditingField] = useState(null);
   const fileInputRef = useRef(null);
-
+  const navigate = useNavigate();
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -49,8 +48,8 @@ export default function Profile() {
 
   const handleLogout = () => {
     logout();
-    toastBye(`Espero vuelvas pronto, ${profile.userName}`);
     navigate("/", { replace: true });
+    toastBye(`Espero vuelvas pronto, ${profile.userName}`);
   };
 
   const handlePartialSave = async (field) => {
@@ -213,7 +212,6 @@ export default function Profile() {
                         {profile?.role || authUser?.role}
                     </span>
                 </div>
-
                 {/* Botón Logout */}
                 <button
                     onClick={handleLogout}

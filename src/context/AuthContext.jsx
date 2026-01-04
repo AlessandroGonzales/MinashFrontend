@@ -49,7 +49,7 @@ export function AuthProvider({ children }) {
           role = "CEO";
           break;
         default:
-          role = "Cliente"; // fallback seguro
+          role = "Cliente"; 
       }
 
       return {

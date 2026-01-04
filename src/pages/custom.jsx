@@ -185,16 +185,7 @@ export default function CustomService() {
     <div className="min-h-screen bg-blackDeep text-primary font-satoshi selection:bg-gold selection:text-black">
       {/* Header */}
       <div className="pt-14 pb-20 px-6 md:px-12 lg:px-24 text-center">
-        <h1 className="text-5xl md:text-7xl font-bold tracking-tighter mb-4">
-          <div className="max-w-7xl mx-auto px-6 pt-10">
-            <button
-              onClick={() => navigate("/services")}
-              className="group flex items-center gap-3 text-xs font-bold tracking-[0.3em] uppercase opacity-70 hover:opacity-100 transition-all"
-            >
-              <ArrowLeft className="w-4 h-4 group-hover:-translate-x-2 transition-transform" />
-              Regresar
-            </button>
-          </div>
+        <h1 className="text-5xl md:text-7xl font-bold tracking-tighter mb-4 ">
           Diseño <span className="text-gold">Custom</span>
         </h1>
         <p className="text-ice/50 text-lg max-w-xl mx-auto">

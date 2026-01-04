@@ -24,10 +24,11 @@ const FullServiceDetails = () => {
   const [service, setService] = useState(null);
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
+  const [inputQuantity, setInputQuantity] = useState("1");
   const [details, setDetails] = useState("");
   const [selectedColor, setSelectedColor] = useState("");
   const [selectedSize, setSelectesSize] = useState("");
-  const {  isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuth();
   const [showAuthModal, setShowAuthModal] = useState(false);
 
   useEffect(() => {
@@ -55,6 +56,24 @@ const FullServiceDetails = () => {
     fetchService();
   }, [id, navigate]);
 
+  useEffect(() => {
+    setInputQuantity(String(quantity));
+  }, [quantity]);
+
+  const commitQuantityFromInput = () => {
+    const raw = inputQuantity?.toString().trim();
+    if (!raw) {
+      setQuantity(1);
+      return;
+    }
+    const parsed = parseInt(raw, 10);
+    if (isNaN(parsed) || parsed < 1) {
+      setQuantity(1);
+    } else {
+      setQuantity(parsed);
+    }
+  };
+
   const handleAddToCart = async () => {
     if (!isAuthenticated) {
       setShowAuthModal(true);
@@ -62,8 +81,8 @@ const FullServiceDetails = () => {
       return;
     }
 
-    if (!selectedColor) {
-      toastError("Selecciona un color");
+    if (!selectedColor || !details || !selectedSize ) {
+      toastInfo("Debes completar todos los campos");
       return;
     }
 
@@ -159,8 +178,8 @@ const FullServiceDetails = () => {
                     onClick={() => setSelectesSize(size)}
                     className={`min-w-[50px] h-[50px] rounded-xl border text-sm font-bold transition-all duration-300 ${
                       selectedSize === size
-                        ? "bg-ice text-blackDeep border-ice"
-                        : "border-white/10 hover:border-gold/50 text-ice/60"
+                        ? "bg-gold text-blackDeep border-gold"
+                        : "border-white/20 hover:border-gold/50 text-ice/60"
                     }`}
                   >
                     {size}
@@ -181,8 +200,8 @@ const FullServiceDetails = () => {
                     onClick={() => setSelectedColor(color)}
                     className={`px-6 py-3 rounded-xl border text-xs font-bold uppercase tracking-widest transition-all duration-300 ${
                       selectedColor === color
-                        ? "bg-gold text-blackDeep border-gold shadow-[0_10px_20px_rgba(212,175,55,0.2)]"
-                        : "border-white/10 hover:border-gold/50 text-ice/60"
+                        ? "bg-gold text-blackDeep border-gold "
+                        : "border-white/20 hover:border-gold/50 text-ice/60"
                     }`}
                   >
                     {color}
@@ -192,21 +211,34 @@ const FullServiceDetails = () => {
             </div>
 
             {/* Cantidad y Precio */}
-            <div className="flex items-center justify-between py-10 border-y border-white/5">
+            <div className="flex items-center justify-between py-10 ">
               <div className="space-y-4">
                 <label className="text-[10px] font-bold tracking-[0.3em] uppercase opacity-70 block">
                   Cantidad
                 </label>
-                <div className="flex items-center bg-white/5 rounded-2xl p-1 border border-white/5">
+                <div className="flex items-center bg-black rounded-2xl p-1 border border-white/20 ">
                   <button
                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
                     className="w-10 h-10 flex items-center justify-center hover:text-gold transition-colors"
                   >
                     <Minus className="w-4 h-4" />
                   </button>
-                  <span className="px-6 text-xl font-medium min-w-[3rem] text-center">
-                    {quantity}
-                  </span>
+                  <input
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    min={1}
+                    step={1}
+                    value={inputQuantity}
+                    onChange={(e) => setInputQuantity(e.target.value)}
+                    onBlur={commitQuantityFromInput}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        commitQuantityFromInput();
+                        e.target.blur();
+                      }
+                    }}
+                    className="min-w-[3rem] text-center bg-transparent "
+                  />
                   <button
                     onClick={() => setQuantity(quantity + 1)}
                     className="w-10 h-10 flex items-center justify-center hover:text-gold transition-colors"
@@ -226,16 +258,16 @@ const FullServiceDetails = () => {
             </div>
 
             {/* Notas Adicionales */}
-            <div className="space-y-4">
+            <div className="space-y-4 bg-black">
               <label className="flex items-center gap-2 text-[10px] font-bold tracking-[0.3em] uppercase opacity-70">
-                <Info className="w-3 h-3" /> Especificaciones del encargo
+                Especificaciones del encargo
               </label>
               <textarea
                 value={details}
                 onChange={(e) => setDetails(e.target.value)}
                 placeholder="Ej: Logo en espalda, hilos dorados..."
                 rows={3}
-                className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-5 text-ice placeholder:opacity-60 focus:outline-none focus:border-gold/50 transition-all resize-none"
+                className="w-full bg-black border border-white/20 rounded-2xl px-6 py-5 text-ice placeholder:opacity-60 "
               />
             </div>
 
@@ -268,7 +300,6 @@ const FullServiceDetails = () => {
         </div>
       </main>
       {showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} />}
-      
     </div>
   );
 };

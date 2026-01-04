@@ -17,11 +17,12 @@ const ServiceDetail = () => {
   const [service, setService] = useState(null);
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
+  const [inputQuantity, setInputQuantity] = useState("1");
   const [details, setDetails] = useState("");
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showSerigraphyModal, setShowSerigraphyModal] = useState(false);
   const [selectedColor, setSelectedColor] = useState("");
-  const { user, isAuthenticated } = useAuth()
+  const { user, isAuthenticated } = useAuth();
 
   const serigraphyStorageKey = user
     ? `serigraphy_warning_accepted_user_${user.iduser}`
@@ -52,9 +53,27 @@ const ServiceDetail = () => {
     fetchService();
   }, [id, navigate]);
 
+  useEffect(() => {
+    setInputQuantity(String(quantity));
+  }, [quantity]);
+
+  const commitQuantityFromInput = () => {
+    const raw = inputQuantity?.toString().trim();
+    if (!raw) {
+      setQuantity(1);
+      return;
+    }
+    const parsed = parseInt(raw, 10);
+    if (isNaN(parsed) || parsed < 1) {
+      setQuantity(1);
+    } else {
+      setQuantity(parsed);
+    }
+  };
+
   const proceedToAddToCart = async () => {
-    if (!selectedColor) {
-      toastError("Selecciona un color");
+    if (!selectedColor || !details ) {
+      toastInfo("Debes completar todos lo campos");
       return;
     }
 
@@ -92,7 +111,6 @@ const ServiceDetail = () => {
     await proceedToAddToCart();
   };
 
-
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-blackDeep">
@@ -105,11 +123,10 @@ const ServiceDetail = () => {
 
   if (!service) return null;
 
-
   const totalPrice = (service.servicePrice || 0) * quantity;
 
   return (
-    <div className="min-h-screen bg-blackDeep text-ice selection:bg-gold/30 selection:text-gold pb-20">
+    <div className="min-h-screen bg-blackDeep text-ice pb-20">
       {/* Header Navegación */}
       <div className="max-w-7xl mx-auto px-6 pt-10">
         <button
@@ -123,7 +140,7 @@ const ServiceDetail = () => {
 
       <main className="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-12 gap-12 mt-12">
         {/* Sección Izquierda: Imagen con efecto de profundidad */}
-         <div className="lg:col-span-7">
+        <div className="lg:col-span-7">
           <div className="sticky top-10">
             <div className="relative group rounded-[2.5rem] overflow-hidden bg-graphite  shadow-2xl">
               {service.imageUrl ? (
@@ -173,7 +190,7 @@ const ServiceDetail = () => {
                     className={`px-6 py-3 rounded-xl border text-xs font-bold uppercase tracking-widest transition-all duration-300 ${
                       selectedColor === color
                         ? "bg-gold text-blackDeep border-gold shadow-[0_10px_20px_rgba(212,175,55,0.2)]"
-                        : "border-white/10 hover:border-gold/50 text-ice/60"
+                        : "border-white/20 hover:border-gold/50 text-ice/60"
                     }`}
                   >
                     {color}
@@ -183,42 +200,63 @@ const ServiceDetail = () => {
             </div>
 
             {/* Cantidad y Precio unitario */}
-           <div className="flex items-center justify-between py-10 border-y border-white/5">
+            <div className="flex items-center justify-between py-10 ">
               <div className="space-y-4">
-                <label className="text-[10px] font-bold tracking-[0.3em] uppercase opacity-70 block">Cantidad</label>
-                <div className="flex items-center bg-white/5 rounded-2xl p-1 border border-white/5">
-                  <button 
+                <label className="text-[10px] font-bold tracking-[0.3em] uppercase opacity-70 block">
+                  Cantidad
+                </label>
+                <div className="flex items-center bg-black rounded-2xl p-1 border border-white/20">
+                  <button
                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
                     className="w-10 h-10 flex items-center justify-center hover:text-gold transition-colors"
                   >
                     <Minus className="w-4 h-4" />
                   </button>
-                  <span className="px-6 text-xl font-medium min-w-[3rem] text-center">{quantity}</span>
-                  <button 
+                  <input
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    min={1}
+                    step={1}
+                    value={inputQuantity}
+                    onChange={(e) => setInputQuantity(e.target.value)}
+                    onBlur={commitQuantityFromInput}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        commitQuantityFromInput();
+                        e.target.blur();
+                      }
+                    }}
+                    className="min-w-[3rem] text-center bg-transparent "
+                  />
+                  <button
                     onClick={() => setQuantity(quantity + 1)}
-                    className="w-10 h-10 flex items-center justify-center hover:text-gold transition-colors"
+                    className="w-10 h-10 flex items-center justify-center "
                   >
                     <Plus className="w-4 h-4" />
                   </button>
                 </div>
               </div>
               <div className="text-right">
-                <label className="text-[10px] font-bold tracking-[0.3em] uppercase opacity-70 block mb-4">Precio Unitario</label>
-                <span className="text-3xl font-light">${service.servicePrice?.toLocaleString()}</span>
+                <label className="text-[10px] font-bold tracking-[0.3em] uppercase opacity-70 block mb-4">
+                  Precio Unitario
+                </label>
+                <span className="text-3xl font-light">
+                  ${service.servicePrice?.toLocaleString()}
+                </span>
               </div>
             </div>
 
             {/* Instrucciones Especiales */}
             <div className="space-y-4">
-              <label className="flex items-center gap-2 text-xs font-bold tracking-[0.2em] uppercase opacity-70">
-                <Info className="w-3 h-3" /> Detalles de Personalización
+              <label className="flex items-center text-xs font-bold tracking-[0.2em] uppercase opacity-70">
+                 Detalles de Personalización
               </label>
               <textarea
                 value={details}
                 onChange={(e) => setDetails(e.target.value)}
                 placeholder="Indica tallas, posiciones o notas específicas..."
                 rows={3}
-                className="w-full bg-steel/25 border border-steel/90 rounded-2xl px-5 py-4 text-ice placeholder:opacity-60 focus:outline-none focus:border-gold/50 focus:ring-1 focus:ring-gold/50 transition-all resize-none"
+                className="w-full bg-black border border-white/20 rounded-2xl px-6 py-5 text-ice placeholder:opacity-60 "
               />
             </div>
 

@@ -1,60 +1,13 @@
 import { useEffect, useState } from "react";
-import { getDraftOrder } from "../../services/authService";
+import {
+  getDraftOrder,
+  deleteDetailsOrderById,
+  deleteCustomById,
+} from "../../services/authService";
 import { getDisplayImageUrl } from "../../Utils/ImageUtils";
-import { ShoppingCart } from "lucide-react";
-
-// Iconos SVG simples para no depender de librerías externas
-const Icons = {
-  Bag: () => (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" />
-      <path d="M3 6h18" />
-      <path d="M16 10a4 4 0 0 1-8 0" />
-    </svg>
-  ),
-  Arrow: () => (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="20"
-      height="20"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M5 12h14" />
-      <path d="m12 5 7 7-7 7" />
-    </svg>
-  ),
-  Tag: () => (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="16"
-      height="16"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M12 2H2v10l9.29 9.29c.94.94 2.48.94 3.42 0l6.58-6.58c.94-.94.94-2.48 0-3.42L12 2Z" />
-      <path d="M7 7h.01" />
-    </svg>
-  ),
-};
+import { toastSuccess } from "../../Utils/toast";
+import { Trash2, Package, Sparkles, ArrowRight, ShieldCheck, ShoppingCart} from  "lucide-react";
+import { Link } from "react-router-dom";
 
 export default function Cart() {
   const [order, setOrder] = useState(null);
@@ -78,301 +31,267 @@ export default function Cart() {
     fetchCart();
   }, []);
 
-  // --- UI STATES ---
+  const handleDeleteDetailsOrder = async (id) => {
+    try {
+      await deleteDetailsOrderById(id);
+      const data = await getDraftOrder();
+      setOrder(data);
+      setDetailsOrders(data.detailsOrders ?? []);
+      setCustoms(data.customs ?? []);
+      toastSuccess(`Producto eliminado!`);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleDeleteCustom = async (id) => {
+    try {
+      await deleteCustomById(id);
+      const data = await getDraftOrder();
+      setOrder(data);
+      setDetailsOrders(data.detailsOrders ?? []);
+      setCustoms(data.customs ?? []);
+      toastSuccess(`Producto Personalizado eliminado!`);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  // --- COMPONENTES UI INTERNOS PARA MANTENER EL ARCHIVO LIMPIO ---
+
+  const CartItem = ({ image, title, subtitle, price, unitPrice, color, size, details, count, onDelete, isCustom }) => (
+    <div className="group relative flex flex-col sm:flex-row gap-6 p-6 border-b border-white/5 hover:bg-white/[0.02] transition-colors duration-500 last:border-0">
+      
+      {/* Indicador de Tipo (Solo visual) */}
+      <div className={`absolute left-0 top-6 bottom-6 w-0.5 rounded-r-full transition-all duration-300 ${isCustom ? 'bg-purple-500/50 group-hover:bg-purple-500' : 'bg-gold/50 group-hover:bg-gold'}`}></div>
+
+      {/* Imagen */}
+      <div className="relative w-full sm:w-32 aspect-[3/4] sm:aspect-square rounded-xl overflow-hidden bg-white/5 shadow-2xl shrink-0">
+        {image ? (
+          <img src={image} alt={title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-white/20">
+            <Package size={24} />
+          </div>
+        )}
+        {isCustom && (
+            <div className="absolute top-2 right-2 bg-purple-500/20 backdrop-blur-md border border-purple-500/30 p-1.5 rounded-full text-purple-300 shadow-[0_0_15px_rgba(168,85,247,0.3)]">
+                <Sparkles size={12} />
+            </div>
+        )}
+      </div>
+
+      {/* Info Principal */}
+      <div className="flex-1 flex flex-col justify-between py-1">
+        <div>
+          <div className="flex justify-between items-start gap-4">
+            <div>
+              <h3 className="text-lg font-medium text-ice tracking-wide">{title}</h3>
+              <p className="text-[12px] font-mono text-white/60 uppercase tracking-widest mt-1">{subtitle}</p>
+            </div>
+            <div className="text-right">
+              <p className="text-xl text-gold tracking-tight">${price?.toLocaleString("en-US")}</p>
+              <p className="text-[15px] text-white/60 text-right">x {count}</p>
+            </div>
+          </div>
+
+          {/* Specs Grid */}
+          <div className="flex flex-wrap gap-4 mt-4">
+            {/* Color */}
+            <div className="flex items-center gap-2 pr-4 border-r border-white/10">
+                <span className="text-[10px] uppercase text-white/40 font-bold tracking-wider">Color</span>
+                <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full ring-1 ring-white/20" style={{backgroundColor: 'white'}}></span> 
+                    {/* Nota: En un caso real usaría el color hexadecimal real, aquí uso white/text por simplicidad o un mapa de colores */}
+                    <span className="text-sm text-ice/80">{color}</span>
+                </div>
+            </div>
+            
+            {/* Talla */}
+            {size && (
+                <div className="flex items-center gap-2">
+                     <span className="text-[10px] uppercase text-white/40 font-bold tracking-wider">Size</span>
+                     <span className="text-sm text-ice/80 font-mono">{size}</span>
+                </div>
+            )}
+          </div>
+
+          {/* Detalles adicionales */}
+          {details && (
+            <div className="mt-3 p-3 bg-white/[0.03] rounded-lg border border-white/5 mb-8">
+                <p className="text-xs text-ice/70 italic leading-relaxed line-clamp-2">"{details}"</p>
+            </div>
+          )}
+        </div>
+
+        {/* Acciones (Bottom) */}
+        <div className="flex justify-between items-end mt-4 sm:mt-0 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 sm:translate-y-2 sm:group-hover:translate-y-0 transition-all duration-300">
+             <button 
+                onClick={onDelete}
+                className="flex items-center gap-2 text-red-400/60 hover:text-red-400 transition-colors text-xs uppercase tracking-widest font-bold group/btn"
+             >
+                <Trash2 size={14} className="group-hover/btn:scale-110 transition-transform"/>
+                <span>Remover Item</span>
+             </button>
+             <div className="text-[13px] text-white/6 q0 ">
+                UNIT: ${unitPrice?.toLocaleString("en-US")}
+             </div>
+        </div>
+      </div>
+    </div>
+  );
+
+
+  // --- MAIN RENDER ---
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-blackDeep flex flex-col items-center justify-center space-y-4">
-        <div className="w-12 h-12 border-t-2 border-gold rounded-full animate-spin"></div>
-        <p className="text-ice tracking-widest uppercase text-xs animate-pulse">
-          Cargando Sistema...
-        </p>
-      </div>
-    );
-  }
-
-  const hasItems = detailsOrders.length > 0 || customs.length > 0;
-
-  if (!hasItems) {
-    return (
-      <div className="min-h-[70vh] flex flex-col items-center justify-center text-center px-6">
-        <div className="text-steel mb-6 opacity-50">
-          <Icons.Bag />
+      <div className="min-h-screen bg-blackDeep flex flex-col items-center justify-center space-y-4 font-['Satoshi']">
+        <div className="relative">
+             <div className="w-16 h-16 border border-gold/20 rounded-full animate-[spin_3s_linear_infinite]"></div>
+             <div className="absolute inset-0 border-t border-gold rounded-full animate-spin"></div>
         </div>
-        <h2 className="text-2xl font-light text-primary mb-2">
-          Tu bolsa está vacía
-        </h2>
-        <p className="text-ice text-sm mb-8 max-w-md">
-          Parece que aún no has añadido nada a tu colección.
-        </p>
-        <button className="px-8 py-3 bg-transparent border border-steel text-primary text-sm uppercase tracking-wider hover:bg-white hover:text-blackDeep transition-all duration-300">
-          Explorar Catálogo
-        </button>
+        <p className="text-gold/50 text-[10px] tracking-[0.3em] uppercase animate-pulse">Sincronizando Inventario...</p>
       </div>
     );
   }
 
-  // --- MAIN RENDER ---
-  return (
-    <div className="min-h-screen bg-blackDeep text-primary pb-20 pt-10">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        {/* HEADER */}
-        <header className="mb-14 pb-8 flex flex-col md:flex-row md:justify-between md:items-end gap-4">
-          <div>
-            <h1 className="text-4xl md:text-5xl font-extralight tracking-tight">
-              Tu <span className="text-gold font-normal">Carrito</span>
-            </h1>
-            <p className="text-steel text-sm mt-2">
-              Revisa cada detalle antes de continuar
-            </p>
-          </div>
+  const totalItems = detailsOrders.length + customs.length;
 
-          <div className="flex items-center gap-3 text-ice text-sm">
-            <ShoppingCart size={18} className="opacity-70" />
-            <span className="tracking-widest uppercase">
-              {detailsOrders.length + customs.length} productos
-            </span>
+  if (totalItems === 0) {
+    return (
+      <div className="min-h-[80vh] flex flex-col items-center justify-center bg-blackDeep px-6 font-['Satoshi']">
+        <div className="w-24 h-24 rounded-full bg-graphite border border-white/5 flex items-center justify-center mb-8 shadow-[0_0_40px_rgba(255,255,255,0.05)]">
+            <Package size={32} className="text-white/70" />
+        </div>
+        <h2 className="text-3xl font-light text-white mb-2">Inventario Vacío</h2>
+        <p className="text-white/40 text-sm mb-10 text-center max-w-sm">Tu colección digital no tiene items. Comienza un proyecto para verlo aquí.</p>
+        <Link to="/services">
+        <button className="px-6 py-3 rounded-md text-sm uppercase bg-transparent border border-gold text-gold hover:bg-gold/25 transition">
+            Explorar Catálogo
+        </button>
+        </Link>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-blackDeep text-ice pb-20 pt-10 font-['Satoshi'] selection:bg-gold/30">
+      <div className="max-w-7xl mx-auto px-6 lg:px-8">
+        
+        {/* HEADER FUTURISTA */}
+        <header className="mb-16 pb-6 flex flex-col md:flex-row justify-between gap-6">
+          <div>
+            <div className="flex items-center gap-3 mb-2">
+              <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse shadow-[0_0_10px_#22c55e]"></span>
+              <span className="text-[10px] text-green-500 font-mono uppercase tracking-widest">Sistema Activo</span>
+            </div>
+            <h1 className="text-5xl md:text-6xl font-black text-white tracking-tight flex items-center gap-4">
+              CARRITO <ShoppingCart className="text-gold" size={40} />
+            </h1>
+          </div>
+          <div className="text-right hidden md:block">
+            <p className="text-[10px] text-white/30 uppercase tracking-[0.2em] mb-1">Total Items</p>
+            <p className="text-2xl font-mono text-white">{totalItems.toString().padStart(2, '0')}</p>
           </div>
         </header>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 xl:gap-20">
-          {/* COLUMNA IZQUIERDA: LISTA DE PRODUCTOS */}
-          <div className="lg:col-span-8 space-y-0 divide-y divide-steel/20">
-            {/* 1. SERVICIOS (Standard Items) */}
-            {detailsOrders.map((item) => (
-              <div
-                key={item.idDetailsOrder}
-                className="py-8 px-2 rounded-xl transition-all duration-500
-             hover:bg-white/5 hover:shadow-xl hover:shadow-blackDeep/40 group"
-              >
-                <div className="flex flex-col sm:flex-row gap-6">
-                  {/* IMAGEN DEL SERVICIO */}
-                  <div className="w-full sm:w-40 aspect-square bg-graphite rounded-sm overflow-hidden border border-steel/20 shrink-0 relative">
-                    {item.imageUrl ? (
-                      <img
-                        src={getDisplayImageUrl(item.imageUrl)}
-                        alt={item.serviceName}
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-90 group-hover:opacity-100"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-steel/40">
-                        <Icons.Tag />
-                      </div>
-                    )}
-                  </div>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-24 relative">
+          
+          {/* LEFT: ITEM LIST */}
+          <div className="lg:col-span-8">
+            
 
-                  <div className="flex-1 flex flex-col justify-between">
-                    <div>
-                      <div className="flex justify-between items-start mb-2">
-                        <div>
-                          <h3 className="text-xl font-medium text-primary tracking-wide uppercase">
-                            {item.serviceName ||
-                              `Servicio #${
-                                item.idService ?? item.idGarmentService
-                              }`}
-                          </h3>
-                          <p className="text-xs text-steel mt-1 uppercase tracking-widest">
-                            ID Ref:{" "}
-                            {item.idService
-                              ? `SRV-${item.idService}`
-                              : `GRM-${item.idGarmentService}`}
-                          </p>
-                        </div>
+            <div className="rounded-3xl border border-white/10 bg-graphite/20 overflow-hidden backdrop-blur-sm">
+                
+                {/* Standard Items */}
+                {detailsOrders.map((item) => (
+                    <CartItem 
+                        key={item.idDetailsOrder}
+                        title={item.serviceName || `Service Node ${item.idService ?? item.idGarmentService}`}
+                        subtitle={item.idService ? `ID: SRV-${item.idService}` : `ID: GRM-${item.idGarmentService}`}
+                        price={item.subTotal}
+                        unitPrice={item.unitPrice}
+                        image={item.imageUrl ? getDisplayImageUrl(item.imageUrl) : null}
+                        color={item.selectedColor}
+                        size={item.selectedSize}
+                        details={item.details}
+                        count={item.count}
+                        isCustom={false}
+                        onDelete={() => handleDeleteDetailsOrder(item.idDetailsOrder)}
+                    />
+                ))}
 
-                        <div className="text-right">
-                          <p className="text-gold font-bold text-lg">
-                            ${item.subTotal?.toLocaleString("en-US")}
-                          </p>
-                          <p className="text-xs text-steel">
-                            ${item.unitPrice?.toLocaleString("en-US")} unit
-                          </p>
-                        </div>
-                      </div>
-
-                      {/* ATRIBUTOS SELECCIONADOS */}
-                      <div className="flex flex-wrap gap-3 mt-4">
-                        <div
-                          className="flex items-center gap-2 px-3 py-1.5 rounded-full
-                  bg-gradient-to-r from-gold/20 to-gold/5
-                  border border-gold/30"
-                        >
-                          <span className="w-2 h-2 rounded-full bg-gold"></span>
-                          <span className="text-xs uppercase tracking-wider text-ice">
-                            {item.selectedColor}
-                          </span>
-                        </div>
-
-                        {item.selectedSize && (
-                          <div
-                            className="px-3 py-1.5 rounded-full bg-steel/10 border border-steel/30
-                    text-xs uppercase tracking-wider text-ice
-                    animate-[fadeInUp_0.3s_ease-out_forwards]"
-                          >
-                            Talla {item.selectedSize}
-                          </div>
-                        )}
-                      </div>
-
-                      {/* DETALLES ADICIONALES */}
-                      {item.details && (
-                        <div className="bg-blackDeep/30 p-3 border-l mt-6 border-gold/50">
-                          <p className="text-steel text-sm italic leading-relaxed line-clamp-2">
-                            "{item.details}"
-                          </p>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* CONTADOR DE ITEMS */}
-                    <div className="mt-6 flex items-center justify-between border-t border-steel/10 pt-4">
-                      <p className="text-xs text-ice uppercase tracking-widest">
-                        Cantidad:{" "}
-                        <span className="text-primary font-bold ml-1">
-                          {item.count}
-                        </span>
-                      </p>
-
-                      {/* Acción Opcional: Eliminar */}
-                      <button className="text-[12px] text-steel hover:text-gold uppercase tracking-widest transition-colors">
-                        Remover
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-
-            {/* 2. CUSTOMS (Productos Personalizados) */}
-            {customs.map((custom) => (
-              <div
-                key={custom.idCustom}
-                className="py-8 px-2 rounded-xl transition-all duration-500
-             hover:bg-white/5 hover:shadow-xl hover:shadow-blackDeep/40 group"
-              >
-                <div className="flex flex-col sm:flex-row gap-6">
-                  {/* Imagen del producto */}
-                  <div className="w-full sm:w-40 aspect-square bg-graphite rounded-sm overflow-hidden border border-steel/20 shrink-0 relative">
-                    {custom.imageUrl?.[0] ? (
-                      <img
-                        src={getDisplayImageUrl(custom.imageUrl[0])}
-                        alt="Custom Product"
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-steel/40">
-                        <span className="text-xs uppercase">No IMG</span>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="flex-1 flex flex-col justify-between">
-                    <div>
-                      <div className="flex justify-between items-start mb-2">
-                        <h3 className="text-xl font-medium text-primary tracking-wide">
-                          Diseño Personalizado
-                        </h3>
-                        <div className="text-right">
-                          <p className="text-gold font-bold text-lg">
-                            ${custom.customTotal}
-                          </p>
-                          <p className="text-xs text-steel">
-                            ${custom.totalPrice} unit
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="flex flex-wrap gap-3 mt-4">
-                        <div
-                          className="flex items-center gap-2 px-3 py-1.5 rounded-full
-                  bg-gradient-to-r from-gold/20 to-gold/5
-                  border border-gold/30"
-                        >
-                          <span className="w-2 h-2 rounded-full bg-gold"></span>
-                          <span className="text-xs uppercase tracking-wider text-ice">
-                            {custom.selectedColor}
-                          </span>
-                        </div>
-
-                        {custom.selectedSize && (
-                          <div
-                            className="px-3 py-1.5 rounded-full bg-steel/10 border border-steel/30
-                    text-xs uppercase tracking-wider text-ice
-                    animate-[fadeInUp_0.3s_ease-out_forwards]"
-                          >
-                            Talla {custom.selectedSize}
-                          </div>
-                        )}
-                      </div>
-                      {custom.customerDetails && (
-                        <div className="bg-blackDeep/30 p-3 border-l mt-6 border-gold/50">
-                          <p className="text-steel text-sm italic leading-relaxed line-clamp-2">
-                            "{custom.customerDetails}"
-                          </p>
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="mt-6 flex items-center justify-between border-t border-steel/10 pt-4">
-                      <p className="text-xs text-ice uppercase tracking-widest">
-                        Items:{" "}
-                        <span className="text-primary font-bold ml-1">
-                          {custom.count}
-                        </span>
-                      </p>
-                      <button className="text-[12px] text-steel hover:text-gold uppercase tracking-widest transition-colors">
-                        Remover
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* COLUMNA DERECHA: RESUMEN (Sticky) */}
-          <div className="lg:col-span-4 ">
-            <div className="sticky top-24 bg-graphite/60 backdrop-blur-xl border border-white/5 rounded-3xl p-8 shadow-2xl ">
-              <h3 className="text-lg font-light text-primary mb-6 border-b border-steel/30 pb-4">
-                Resumen de Orden
-              </h3>
-
-              <div className="space-y-4 mb-8 ">
-                <div className="flex justify-between text-ice text-sm">
-                  <span>Subtotal</span>
-                  <span>${order?.total?.toLocaleString("en-US")}</span>
-                </div>
-                <div className="flex justify-between text-ice text-sm">
-                  <span>Envío</span>
-                  <span className="text-steel italic">Calculado al final</span>
-                </div>
-              </div>
-
-              <div className="flex justify-between items-end border-t border-steel/30 pt-6 mb-8">
-                <span className="text-primary text-lg font-medium">
-                  Total Estimado
-                </span>
-                <div className="text-right">
-                  <span className="block text-2xl font-bold text-gold tracking-tight">
-                    ${order?.total?.toLocaleString("en-US")}
-                  </span>
-                  <span className="text-xs text-steel uppercase tracking-wider">
-                    Inc. Impuestos
-                  </span>
-                </div>
-              </div>
-
-              <button className="w-full bg-gold hover:bg-[#B89655] text-blackDeep font-bold py-4 px-6 rounded-sm uppercase tracking-widest transition-all duration-300 flex items-center justify-center gap-3 group">
-                Checkout
-                <span className="group-hover:translate-x-1 transition-transform">
-                  <Icons.Arrow />
-                </span>
-              </button>
-
-              <p className="mt-4 text-center text-steel text-xs">
-                Pagos seguros y encriptados.
-              </p>
+                {/* Custom Items */}
+                {customs.map((custom) => (
+                    <CartItem 
+                        key={custom.idCustom}
+                        title="Diseño Customizado"
+                        subtitle={`PROJECT ID: CST-${custom.idCustom}`}
+                        price={custom.customTotal}
+                        unitPrice={custom.totalPrice}
+                        image={custom.imageUrl?.[0] ? getDisplayImageUrl(custom.imageUrl[0]) : null}
+                        color={custom.selectedColor}
+                        size={custom.selectedSize}
+                        details={custom.customerDetails}
+                        count={custom.count}
+                        isCustom={true}
+                        onDelete={() => handleDeleteCustom(custom.idCustom)}
+                    />
+                ))}
             </div>
           </div>
+
+          {/* RIGHT: SUMMARY PANEL */}
+          <div className="lg:col-span-4">
+            <div className="sticky top-24">
+                <div className="relative p-8 rounded-[2rem] bg-[#1a1a1a]/80 backdrop-blur-xl border border-white/10 overflow-hidden group">
+                    
+                    {/* Background glow effects */}
+                    <div className="absolute -top-20 -right-20 w-40 h-40 bg-gold/10 rounded-full blur-3xl pointer-events-none group-hover:bg-gold/20 transition-all duration-700"></div>
+                    <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-purple-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+                    <h3 className="text-xl  text-white mb-8 flex items-center gap-2">
+                        Resumen <span className="text-white/20">/</span> Finanzas
+                    </h3>
+
+                    <div className="space-y-4 mb-8">
+                        <div className="flex justify-between items-baseline group/row cursor-default">
+                            <span className="text-sm text-white/40 group-hover/row:text-white/60 transition-colors">Subtotal</span>
+                            <span className=" text-ice">${order?.total?.toLocaleString("en-US")}</span>
+                        </div>
+                        <div className="flex justify-between items-baseline group/row cursor-default">
+                            <span className="text-sm text-white/40 group-hover/row:text-white/60 transition-colors">Impuestos</span>
+                            <span className=" text-ice/60 text-xs">Calculado en checkout</span>
+                        </div>
+                        <div className="flex justify-between items-baseline group/row cursor-default">
+                            <span className="text-sm text-white/40 group-hover/row:text-white/60 transition-colors">Envío</span>
+                            <span className=" text-ice/60 text-xs">Por definir</span>
+                        </div>
+                    </div>
+
+                    <div className="h-px bg-gradient-to-r from-transparent via-white/20 to-transparent mb-8"></div>
+
+                    <div className="flex justify-between items-end mb-8">
+                        <span className="text-sm font-bold uppercase tracking-widest text-gold">Total Estimado</span>
+                        <div className="text-right">
+                             <span className="block text-3xl font-black text-white tracking-tight">${order?.total?.toLocaleString("en-US")}</span>
+                        </div>
+                    </div>
+
+                    <button className="relative w-full overflow-hidden py-4 px-6 rounded-xl font-bold uppercase tracking-[0.2em] text-xs duration-300 flex items-center justify-center gap-4 group/btn  bg-transparent border border-gold text-gold hover:bg-gold/25 transition">
+                        <span className="relative z-10">Proceder al pago</span>
+                        <ArrowRight size={16} className="relative z-10 group-hover/btn:translate-x-1 transition-transform" />
+                    </button>
+
+                    <div className="mt-6 flex justify-center items-center gap-2 text-white/60">
+                        <ShieldCheck size={20} />
+                        <span className="text-[11px] uppercase tracking-widest">Pagos Encriptados SSL</span>
+                    </div>
+                </div>
+            </div>
+          </div>
+
         </div>
       </div>
     </div>

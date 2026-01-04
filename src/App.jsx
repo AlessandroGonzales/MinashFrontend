@@ -42,7 +42,6 @@ export default function App() {
             <Route path="/services" element={<Servicios />} />
             <Route path="/serigraphy" element={<Serigraphy />} />
             <Route path="/contact" element={<Contacto />} />
-            <Route path="/login" element={<Login />} />
             <Route path="/serigraphy/:id" element={<ServiceDetail />} />
             <Route path="/fullServices" element={<FullServices />} />
             <Route path="/fullServices/:id" element={<FullServiceDetails />} />
