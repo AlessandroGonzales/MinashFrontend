@@ -33,8 +33,8 @@ export default function App() {
       <ScrollToTop />
       <div className="bg-blackDeep min-h-screen text-primary">
         <Navbar />
-
-        <main className="pt-24">
+        <div className="mb-16"></div>
+        <main className="">
           <Routes>
             {/* 🌍 RUTAS PÚBLICAS */}
             <Route path="/" element={<Home />} />

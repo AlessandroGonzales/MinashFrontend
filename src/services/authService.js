@@ -18,6 +18,11 @@ export const getAllGarment = async () => {
   return response.data;
 };
 
+export const getVideos = async () => {
+  const response = await api.get(`${API_BASE_URL}/api/video`);
+  return response.data;
+}
+
 export const getAllServices = async () => {
   const response = await api.get(`${API_BASE_URL}/api/service`);
   return response.data;
@@ -208,3 +213,4 @@ export const deleteCustomById = async (customId) => {
   );
   return res.data;
 }
+

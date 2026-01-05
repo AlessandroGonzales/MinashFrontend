@@ -8,6 +8,7 @@ import { useCart } from "../context/CartContext";
 import { createDetailsOrder } from "../services/authService";
 import { getDisplayImageUrl } from "../Utils/ImageUtils";
 import { useAuth } from "../context/AuthContext";
+import PRICING_RULES from "../pages/PRICING_RULES";
 
 const ServiceDetail = () => {
   const { id } = useParams();
@@ -72,7 +73,7 @@ const ServiceDetail = () => {
   };
 
   const proceedToAddToCart = async () => {
-    if (!selectedColor || !details ) {
+    if (!selectedColor || !details) {
       toastInfo("Debes completar todos lo campos");
       return;
     }
@@ -123,7 +124,19 @@ const ServiceDetail = () => {
 
   if (!service) return null;
 
-  const totalPrice = (service.servicePrice || 0) * quantity;
+  const discountRule = PRICING_RULES[service.serviceName]; // O usa service.idService si prefieres
+
+  // 2. Verificamos si aplica el descuento
+  const appliesDiscount = discountRule && quantity >= discountRule.threshold;
+
+  // 3. Calculamos el porcentaje a descontar
+  const discountPercentage = appliesDiscount ? discountRule.discount : 0;
+
+  // 4. Precios matemáticos
+  const baseUnitPrice = service.servicePrice || 0;
+  const finalUnitPrice = baseUnitPrice * (1 - discountPercentage);
+  const totalBasePrice = baseUnitPrice * quantity; // Precio sin descuento (para mostrar tachado)
+  const totalPrice = finalUnitPrice * quantity; // Precio final a pagar
 
   return (
     <div className="min-h-screen bg-blackDeep text-ice pb-20">
@@ -235,6 +248,18 @@ const ServiceDetail = () => {
                     <Plus className="w-4 h-4" />
                   </button>
                 </div>
+
+                {discountRule && !appliesDiscount && (
+                  <p className="text-[12px] text-gold/80 mt-2 text-center">
+                    ¡Lleva {discountRule.threshold}  unidades o mas para un{" "}
+                    {discountRule.discount * 100}% de descuento!
+                  </p>
+                )}
+                {appliesDiscount && (
+                  <p className="text-[12px] text-green-400 mt-2 text-center font-bold">
+                    ¡Descuento mayorista aplicado!
+                  </p>
+                )}
               </div>
               <div className="text-right">
                 <label className="text-[10px] font-bold tracking-[0.3em] uppercase opacity-70 block mb-4">
@@ -249,7 +274,7 @@ const ServiceDetail = () => {
             {/* Instrucciones Especiales */}
             <div className="space-y-4">
               <label className="flex items-center text-xs font-bold tracking-[0.2em] uppercase opacity-70">
-                 Detalles de Personalización
+                Detalles de Personalización
               </label>
               <textarea
                 value={details}
@@ -262,9 +287,25 @@ const ServiceDetail = () => {
 
             {/* Footer de Compra - Sticky en móvil */}
             <div className="pt-6">
-              <div className="flex items-end justify-between mb-6">
+              <div className="flex flex-col items-end mb-6">
                 <span className="text-sm opacity-70 mb-1">TOTAL ESTIMADO</span>
-                <span className="text-4xl  tracking-tighter text-gold">
+                {/* MOSTRAR PRECIO ANTERIOR TACHADO SI HAY DESCUENTO */}
+                {appliesDiscount && (
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="bg-green-500/20 text-green-400 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider">
+                      {discountPercentage * 100}% OFF POR MAYORISTA
+                    </span>
+                    <span className="text-lg text-white/40 line-through decoration-white/40">
+                      $
+                      {totalBasePrice.toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                      })}
+                    </span>
+                  </div>
+                )}
+
+                {/* PRECIO FINAL */}
+                <span className="text-4xl tracking-tighter text-gold">
                   $
                   {totalPrice.toLocaleString(undefined, {
                     minimumFractionDigits: 2,

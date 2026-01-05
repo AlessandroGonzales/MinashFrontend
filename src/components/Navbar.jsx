@@ -49,8 +49,8 @@ export default function Navbar() {
 
   return (
     <>
-      <header className="w-full fixed top-0 left-0 z-50 h-16 bg-graphite/90 backdrop-blur-md shadow-lg border-b border-steel/40">
-        <nav className="max-w-7xl mx-auto px-6 h-full flex items-center justify-between">
+      <header className="w-full fixed top-0 left-0 z-50 h-16  bg-graphite/90 backdrop-blur-md shadow-lg border-b border-steel/40 ">
+        <nav className="max-w-7xl mx-auto px-6 h-full flex items-center justify-between ">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
             <img
@@ -101,7 +101,7 @@ export default function Navbar() {
               )}
             </button>
           </div>
-
+              
           {/* Mobile Hamburger */}
           <button
             onClick={() => setOpen(!open)}
@@ -149,7 +149,7 @@ export default function Navbar() {
                 setOpen(false);
                 handleUserClick();
               }}
-              className="flex items-center gap-3 hover:text-gold transition "
+              className="flex items-center  justify-center gap-3 hover:text-gold transition "
             >
               <span className="text-lg">
                 {isAuthenticated ? `${user.name}` : "Iniciar sesión"}
@@ -164,7 +164,7 @@ export default function Navbar() {
                 <User size={24} />
               )}
             </button>
-          </div>
+          </div >
         )}
       </header>
 

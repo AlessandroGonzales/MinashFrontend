@@ -14,11 +14,10 @@ export default function AuthModal({ onClose }) {
   const handleRegisterSuccess = (name) => {
     setUserName(name);
     setShowWelcome(true);
-    setStep("choice");
+    setStep("login");
 
     setTimeout(() => {
       setShowWelcome(false);
-      onClose(); // cierra el modal completo
     }, 4000);
   };
 

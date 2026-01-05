@@ -15,6 +15,7 @@ import { createDetailsOrder } from "../services/authService";
 import { getDisplayImageUrl } from "../Utils/ImageUtils";
 import { useAuth } from "../context/AuthContext";
 import AuthModal from "../components/auth/AuthModal";
+import PRICING_RULES from "../pages/PRICING_RULES";
 
 const FullServiceDetails = () => {
   const { id } = useParams();
@@ -81,7 +82,7 @@ const FullServiceDetails = () => {
       return;
     }
 
-    if (!selectedColor || !details || !selectedSize ) {
+    if (!selectedColor || !details || !selectedSize) {
       toastInfo("Debes completar todos los campos");
       return;
     }
@@ -112,7 +113,19 @@ const FullServiceDetails = () => {
   }
 
   if (!service) return null;
-  const totalPrice = (service.addtionalPrice || 0) * quantity;
+  const discountRule = PRICING_RULES[service.garmentServiceName]; // O usa service.idService si prefieres
+
+  // 2. Verificamos si aplica el descuento
+  const appliesDiscount = discountRule && quantity >= discountRule.threshold;
+
+  // 3. Calculamos el porcentaje a descontar
+  const discountPercentage = appliesDiscount ? discountRule.discount : 0;
+
+  // 4. Precios matemáticos
+  const baseUnitPrice = service.addtionalPrice || 0;
+  const finalUnitPrice = baseUnitPrice * (1 - discountPercentage);
+  const totalBasePrice = baseUnitPrice * quantity; // Precio sin descuento (para mostrar tachado)
+  const totalPrice = finalUnitPrice * quantity; // Precio final a pagar
 
   return (
     <div className="min-h-screen bg-blackDeep text-ice font-['Satoshi'] selection:bg-gold/30 pb-20">
@@ -246,6 +259,17 @@ const FullServiceDetails = () => {
                     <Plus className="w-4 h-4" />
                   </button>
                 </div>
+                {discountRule && !appliesDiscount && (
+                  <p className="text-[12px] text-gold/80 mt-2 text-center">
+                    ¡Lleva {discountRule.threshold}  unidades o mas para un{" "}
+                    {discountRule.discount * 100}% de descuento!
+                  </p>
+                )}
+                {appliesDiscount && (
+                  <p className="text-[12px] text-green-400 mt-2 text-center font-bold">
+                    ¡Descuento mayorista aplicado!
+                  </p>
+                )}
               </div>
               <div className="text-right">
                 <label className="text-[10px] font-bold tracking-[0.3em] uppercase opacity-70 block mb-4">
@@ -272,12 +296,24 @@ const FullServiceDetails = () => {
             </div>
 
             {/* Acción Final */}
-            <div className="pt-4">
-              <div className="flex justify-between items-end mb-8">
-                <span className="text-xs opacity-40 uppercase tracking-widest font-bold">
-                  Inversión Total
-                </span>
-                <span className="text-4xl  tracking-tighter text-gold">
+            <div className="pt-6">
+              <div className="flex flex-col items-end mb-6">
+                <span className="text-sm opacity-70 mb-1">TOTAL ESTIMADO</span>
+                {appliesDiscount && (
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="bg-green-500/20 text-green-400 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider">
+                      {discountPercentage * 100}% OFF POR MAYORISTA
+                    </span>
+                    <span className="text-lg text-white/40 line-through decoration-white/40">
+                      $
+                      {totalBasePrice.toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                      })}
+                    </span>
+                  </div>
+                )}
+
+                <span className="text-4xl tracking-tighter text-gold">
                   $
                   {totalPrice.toLocaleString(undefined, {
                     minimumFractionDigits: 2,

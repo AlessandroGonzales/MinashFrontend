@@ -16,18 +16,27 @@ export default function RegisterForm({ onSuccess }) {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [preview, setPreview] = useState(null);
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
 
-    setFormData((prev) => ({
-      ...prev,
-      [name]: files ? files[0] : value,
-    }));
+    if (files) {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: files[0],
+      }));
+      setPreview(URL.createObjectURL(files[0]));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    }
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault(); 
+    e.preventDefault();
     setLoading(true);
     setError("");
 
@@ -56,7 +65,7 @@ export default function RegisterForm({ onSuccess }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 text-left">
+    <form onSubmit={handleSubmit} className="space-y-3 text-left">
       <input
         type="text"
         name="UserName"
@@ -133,17 +142,37 @@ export default function RegisterForm({ onSuccess }) {
         required
       />
 
-      <input
-        type="file"
-        name="ImageUrl"
-        accept="image/*"
-        onChange={handleChange}
-        className="w-full text-ice text-sm"
-      />
+      <div className="flex flex-col items-center space-y-2">
+          <input
+            type="file"
+            id="ImageUrl"
+            name="ImageUrl"
+            accept="image/*"
+            onChange={handleChange}
+            className="hidden"
+          />
+          <label
+            htmlFor="ImageUrl"
+            className="flex flex-col items-center text-gold text-sm font-medium cursor-pointer hover:opacity-80 transition"
+          >
+            <div className="relative w-24 h-24 rounded-full overflow-hidden border-2 border-steel transition-all duration-200 hover:border-gold">
+              {preview ? (
+                <img
+                  src={preview}
+                  alt="Vista previa"
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="flex items-center justify-center w-full h-full bg-blackDeep text-gold text-5xl">
+                  +
+                </div>
+              )}
+            </div>
+            Subir Foto de Perfil (Opcional)
+          </label>
+        </div>
 
-      {error && (
-        <p className="text-red-500 text-sm">{error}</p>
-      )}
+      {error && <p className="text-red-500 text-sm">{error}</p>}
 
       <button
         type="submit"
