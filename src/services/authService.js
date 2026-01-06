@@ -163,6 +163,23 @@ export const createCustom = async (custom) => {
   return response.data;
 };
 
+export const createMercadoPagoPreference = async (orderId) => {
+  const token = localStorage.getItem("token");
+  if (!token) throw new Error("No autenticado");
+
+  const response = await api.post(
+    `${API_BASE_URL}/api/payment/create-mercadopago`, 
+    { OrderId: orderId }, 
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  return response.data;
+};
+
 // PatchsOfEntitis
 export const patchUserField = async (id, field, value) => {
   const token = localStorage.getItem("token");
