@@ -1,5 +1,14 @@
 // eslint-disable-next-line no-unused-vars
 import { useState, useEffect, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  getAllGarment,
+  getAllServices,
+  createCustom,
+} from "../services/authService";
+import { toastError, toastSuccess, toastInfo } from "../Utils/toast";
+import { getDisplayImageUrl } from "../Utils/ImageUtils";
+import PRICING_RULES from "./PRICING_RULES";
 import {
   Upload,
   X,
@@ -13,14 +22,6 @@ import {
   Loader2,
   ArrowLeft,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import {
-  getAllGarment,
-  getAllServices,
-  createCustom,
-} from "../services/authService";
-import { toastError, toastSuccess, toastInfo } from "../Utils/toast";
-import { getDisplayImageUrl } from "../Utils/ImageUtils";
 
 export default function CustomService() {
   const navigate = useNavigate();
@@ -28,13 +29,15 @@ export default function CustomService() {
   const [services, setServices] = useState([]);
   // eslint-disable-next-line no-unused-vars
   const [isLoadingData, setIsLoadingData] = useState(true);
+  const [inputQuantity, setInputQuantity] = useState("1");
+  const [quantity, setQuantity] = useState(1);
 
   // Estado del Formulario
   const [formData, setFormData] = useState({
     selectedColor: "",
     selectedSize: "",
-    count: 1,
     customerDetails: "",
+    quantity,
     idGarment: null,
     idService: null,
     imageFiles: [], // Array para guardar los objetos File reales
@@ -63,11 +66,29 @@ export default function CustomService() {
 
     fetchData();
   }, []);
+  const commitQuantityFromInput = () => {
+    const raw = inputQuantity?.toString().trim();
+    if (!raw) {
+      setQuantity(1);
+      return;
+    }
+    const parsed = parseInt(raw, 10);
+    if (isNaN(parsed) || parsed < 1) {
+      setQuantity(1);
+    } else {
+      setQuantity(parsed);
+    }
+  };
 
   // --- CÁLCULO DINÁMICO DEL TOTAL ---
-  const customTotal = useMemo(() => {
+  const {
+    discountRule,
+    appliesDiscount,
+    discountPercentage,
+    baseTotal,
+    customTotal,
+  } = useMemo(() => {
     // Buscamos en los arrays cargados desde la API
-    // Nota: Usamos las propiedades del DTO (IdGarment, Price, IdService, ServicePrice)
     const selectedGarment = garments.find(
       (g) => g.idGarment === formData.idGarment
     );
@@ -78,14 +99,28 @@ export default function CustomService() {
     const garmentPrice = selectedGarment ? selectedGarment.price : 0;
     const servicePrice = selectedService ? selectedService.servicePrice : 0;
 
-    return (garmentPrice + servicePrice) * formData.count;
-  }, [
-    formData.idGarment,
-    formData.idService,
-    formData.count,
-    garments,
-    services,
-  ]);
+    const unitPrice = garmentPrice + servicePrice;
+
+    const baseTotal = unitPrice * quantity;
+
+    const discountRule = selectedService
+      ? PRICING_RULES[selectedService.serviceName]
+      : null;
+
+    const appliesDiscount = discountRule && quantity >= discountRule.threshold;
+
+    const discountPercentage = appliesDiscount ? discountRule.discount : 0;
+
+    const customTotal = baseTotal - baseTotal * discountPercentage;
+
+    return {
+      discountRule,
+      appliesDiscount,
+      discountPercentage,
+      baseTotal,
+      customTotal,
+    };
+  }, [formData.idGarment, formData.idService, quantity, garments, services]);
 
   // --- HANDLERS ---
 
@@ -129,7 +164,8 @@ export default function CustomService() {
       !formData.idService ||
       !formData.selectedColor ||
       !formData.selectedSize ||
-      !formData.customerDetails
+      !formData.customerDetails ||
+      !quantity
     ) {
       toastInfo("Por favor completa todos los campos requeridos.");
       return;
@@ -145,7 +181,7 @@ export default function CustomService() {
       dataToSend.append("idService", formData.idService);
       dataToSend.append("selectedColor", formData.selectedColor);
       dataToSend.append("selectedSize", formData.selectedSize);
-      dataToSend.append("count", formData.count);
+      dataToSend.append("count", quantity);
       dataToSend.append("customerDetails", formData.customerDetails);
 
       // Adjuntar imágenes (La clave debe coincidir con "ImageUrl" en tu DTO de C#)
@@ -362,18 +398,32 @@ export default function CustomService() {
                   <Calculator size={16} /> Cantidad
                 </label>
                 <input
-                  type="number"
-                  name="count"
-                  min="1"
-                  value={formData.count}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      count: parseInt(e.target.value) || 1,
-                    })
-                  }
-                  className="w-full bg-graphite/40 border border-steel/50 rounded-xl px-4 py-3 text-primary focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold transition-all"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  min={1}
+                  step={1}
+                  value={inputQuantity}
+                  onChange={(e) => setInputQuantity(e.target.value)}
+                  onBlur={commitQuantityFromInput}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      commitQuantityFromInput();
+                      e.target.blur();
+                    }
+                  }}
+                  className="w-full bg-graphite/40 border border-steel/50 rounded-xl px-4 py-3 text-primary focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold transition-all "
                 />
+                {discountRule && !appliesDiscount && (
+                  <p className="text-[12px] text-gold/80 mt-2 text-center">
+                    ¡Lleva {discountRule.threshold} unidades o mas para un{" "}
+                    {discountRule.discount * 100}% de descuento!
+                  </p>
+                )}
+                {appliesDiscount && (
+                  <p className="text-[12px] text-green-400 mt-2 text-center font-bold">
+                    ¡Descuento mayorista aplicado!
+                  </p>
+                )}
               </div>
             </div>
           </section>
@@ -480,13 +530,27 @@ export default function CustomService() {
                 <span>Cantidad</span>
                 <span className="text-ice">x{formData.count}</span>
               </div>
-              <div className="h-px bg-white/10 my-4" />
-              <div className="flex justify-between items-end">
-                <span className="text-lg font-medium">Total Estimado</span>
+              <div className="pt-6">
+              <div className="flex flex-col items-end mb-6">
+                <span className="text-sm opacity-70 mb-1">TOTAL ESTIMADO</span>
+                {appliesDiscount && (
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="bg-green-500/20 text-green-400 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider">
+                      {discountPercentage * 100}% OFF POR MAYORISTA
+                    </span>
+                    <span className="text-lg text-white/40 line-through decoration-white/40">
+                      $
+                      {baseTotal.toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                      })}
+                    </span>
+                  </div>
+                )}
                 <span className="text-4xl font-satoshi font-bold text-gold">
                   ${customTotal.toLocaleString()}
                 </span>
               </div>
+            </div>
               <p className="text-xs text-ice/60 mt-2 text-right">
                 *El precio final puede variar según complejidad del diseño tras
                 revisión.
