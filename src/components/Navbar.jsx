@@ -218,7 +218,7 @@ export default function Navbar() {
               </li>
               <li>
                 <Link
-                  to="/misordenes"
+                  to="/myordenes"
                   onClick={closeUserMenu}
                   className="flex items-center gap-3 px-6 py-4 hover:bg-steel/30 transition"
                 >

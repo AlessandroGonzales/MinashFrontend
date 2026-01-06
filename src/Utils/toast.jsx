@@ -3,7 +3,7 @@ import { CheckCircle, XCircle, AlertCircle, Info } from 'lucide-react';
 
 const baseConfig = {
   position: "top-right",
-  autoClose: 3050,
+  autoClose: 2300,
   hideProgressBar: false,
   closeOnClick: true,
   pauseOnHover: true,

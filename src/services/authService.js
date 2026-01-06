@@ -63,6 +63,22 @@ export const getDraftOrder = async () => {
   return response.data;
 };
 
+export const getPaidOrder = async () => {
+  const token = localStorage.getItem("token");
+  if (!token) throw new Error("No autenticado");
+
+  const response = await api.get(
+    `${API_BASE_URL}/api/order/paid`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  return response.data;
+};
+
 // GetByIdOfEntitis
 export const getGarmentServiceById = async (id) => {
   const token = localStorage.getItem("token");
@@ -127,6 +143,7 @@ export const getUserProfile = async () => {
 
   return await response.json();
 };
+
 
 // PostOfEntitis
 export const createDetailsOrder = async (detailsOrder) => {

@@ -26,6 +26,7 @@ import ScrollToTop from "./ScrollToTop";
 
 // Pages privadas
 import Profile from "./pages/user/Profile";
+import MyOrders from "./pages/myOrders";
 
 export default function App() {
   return (
@@ -46,6 +47,7 @@ export default function App() {
             <Route path="/fullServices" element={<FullServices />} />
             <Route path="/fullServices/:id" element={<FullServiceDetails />} />
             <Route path="/custom" element={<CustomService />} />
+            
 
             {/* 🔐 RUTAS PRIVADAS (cualquier usuario logueado) */}
             <Route
@@ -63,6 +65,15 @@ export default function App() {
                   <Cart />
                 </PrivateRoute>
               }
+            />
+            <Route
+              path="myordenes"
+              element={
+                <PrivateRoute>
+                  <MyOrders />
+                </PrivateRoute>
+              }
+            
             />
 
             {/* 🧑‍💼 ADMIN (si tenías vistas exclusivas luego se agregan aquí) */}

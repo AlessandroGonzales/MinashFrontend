@@ -1,4 +1,3 @@
-// eslint-disable-next-line no-unused-vars
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -27,7 +26,6 @@ export default function CustomService() {
   const navigate = useNavigate();
   const [garments, setGarments] = useState([]);
   const [services, setServices] = useState([]);
-  // eslint-disable-next-line no-unused-vars
   const [isLoadingData, setIsLoadingData] = useState(true);
   const [inputQuantity, setInputQuantity] = useState("1");
   const [quantity, setQuantity] = useState(1);
