@@ -18,6 +18,19 @@ export const getAllGarment = async () => {
   return response.data;
 };
 
+export const getAllPaidORder = async () => {
+  const token = localStorage.getItem("token");
+  if (!token) throw new Error("No autenticado");
+  const response = await api.get(`${API_BASE_URL}/api/order/paid-orders`,
+    {
+      headers:{
+        Authorization: `Bearer ${token}`
+      }
+    }
+  );
+  return response.data;
+}
+
 export const getVideos = async () => {
   const response = await api.get(`${API_BASE_URL}/api/video`);
   return response.data;
@@ -221,6 +234,27 @@ export const patchUserField = async (id, field, value) => {
     throw new Error(`Error al actualizar: ${response.status} - ${errorText}`);
   }
 
+};
+
+export const patchOrderField = async (id, data) => {
+  // 1. Recuperamos el token del almacenamiento local
+  // Asegúrate de que la clave sea la misma que usas al hacer login (ej: "token", "authToken", etc.)
+  const token = localStorage.getItem("token"); 
+
+  if (!token) {
+    throw new Error("No se encontró el token de autenticación");
+  }
+
+  // 2. Enviamos el token en los headers dentro de la configuración de Axios
+  // La sintaxis de patch es: axios.patch(url, data, config)
+  const response = await api.patch(`/Order/${id}`, data, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json"
+    }
+  });
+
+  return response.data;
 };
 
 // DeletesOfEntitis

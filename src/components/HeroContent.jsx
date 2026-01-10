@@ -20,7 +20,7 @@ export default function HeroContent() {
         <Link to="/services" className="px-6 py-3 border border-steel rounded-md text-sm uppercase hover:bg-gold hover:text-blackDeep transition">
           Ver Servicios
         </Link>
-        <Link to="/contact" className="px-6 py-3 rounded-md text-sm uppercase bg-transparent border border-gold text-gold hover:bg-gold/10 transition">
+        <Link to="/contact" className="px-6 py-3 rounded-md text-sm uppercase bg-transparent border border-gold text-gold hover:bg-gold/30 transition">
           Contactar
         </Link>
       </div>

@@ -9,6 +9,7 @@ import Footer from "./components/Footer";
 import PrivateRoute from "./components/routeGuards/PrivateRoute";
 import AdminRoute from "./components/routeGuards/AdminRoute";
 import UserRoute from "./components/routeGuards/UserRoute";
+import CEORoute from "./components/routeGuards/CEORoute";
 
 // Pages públicas
 import Home from "./pages/home";
@@ -17,7 +18,7 @@ import Contacto from "./pages/contact";
 import Login from "./pages/login";
 import Serigraphy from "./pages/serigraphy";
 import ServiceDetail from "./pages/ServiceDetail";
-import Cart from "./pages/cart/cart";
+import Cart from "./pages/cart/Cart";
 import FullServices from "./pages/FullService";
 import FullServiceDetails from "./pages/FullServiceDetails";
 import CustomService from "./pages/custom";
@@ -27,6 +28,10 @@ import ScrollToTop from "./ScrollToTop";
 // Pages privadas
 import Profile from "./pages/user/Profile";
 import MyOrders from "./pages/myOrders";
+
+// 👔 Page CEO
+import CeoPaidOrders from "./pages/ceo/CeoPaidOrders";
+import CeoPaidOrdersDetails from "./pages/ceo/CeoPaidOrdersDetails";
 
 export default function App() {
   return (
@@ -47,7 +52,6 @@ export default function App() {
             <Route path="/fullServices" element={<FullServices />} />
             <Route path="/fullServices/:id" element={<FullServiceDetails />} />
             <Route path="/custom" element={<CustomService />} />
-            
 
             {/* 🔐 RUTAS PRIVADAS (cualquier usuario logueado) */}
             <Route
@@ -73,20 +77,24 @@ export default function App() {
                   <MyOrders />
                 </PrivateRoute>
               }
-            
             />
-
-            {/* 🧑‍💼 ADMIN (si tenías vistas exclusivas luego se agregan aquí) */}
-            {/*
             <Route
-              path="/admin"
+              path="/ceo/orders"
               element={
-                <AdminRoute>
-                  <AdminDashboard />
-                </AdminRoute>
+                <CEORoute>
+                  <CeoPaidOrders />
+                </CEORoute>
               }
             />
-            */}
+
+            <Route
+              path="/ceo/order/:id"
+              element={
+                <CEORoute>
+                  <CeoPaidOrdersDetails />
+                </CEORoute>
+              }
+            />
           </Routes>
         </main>
 

@@ -8,6 +8,9 @@ import {
 import { toastError, toastSuccess, toastInfo } from "../Utils/toast";
 import { getDisplayImageUrl } from "../Utils/ImageUtils";
 import PRICING_RULES from "./PRICING_RULES";
+import { useAuth } from "../context/AuthContext";
+import AuthModal from "../components/auth/AuthModal";
+
 import {
   Upload,
   X,
@@ -29,6 +32,8 @@ export default function CustomService() {
   const [isLoadingData, setIsLoadingData] = useState(true);
   const [inputQuantity, setInputQuantity] = useState("1");
   const [quantity, setQuantity] = useState(1);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const { isAuthenticated } = useAuth();
 
   // Estado del Formulario
   const [formData, setFormData] = useState({
@@ -157,6 +162,12 @@ export default function CustomService() {
   // --- SUBMIT (Lógica FormData para C#) ---
   const handleSubmit = async () => {
     // Validaciones básicas
+    if (!isAuthenticated) {
+      setShowAuthModal(true);
+      toastInfo("Debes iniciar sesión para realizar la compra");
+      return;
+    }
+
     if (
       !formData.idGarment ||
       !formData.idService ||
@@ -529,26 +540,28 @@ export default function CustomService() {
                 <span className="text-ice">x{formData.count}</span>
               </div>
               <div className="pt-6">
-              <div className="flex flex-col items-end mb-6">
-                <span className="text-sm opacity-70 mb-1">TOTAL ESTIMADO</span>
-                {appliesDiscount && (
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="bg-green-500/20 text-green-400 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider">
-                      {discountPercentage * 100}% OFF POR MAYORISTA
-                    </span>
-                    <span className="text-lg text-white/40 line-through decoration-white/40">
-                      $
-                      {baseTotal.toLocaleString(undefined, {
-                        minimumFractionDigits: 2,
-                      })}
-                    </span>
-                  </div>
-                )}
-                <span className="text-4xl font-satoshi font-bold text-gold">
-                  ${customTotal.toLocaleString()}
-                </span>
+                <div className="flex flex-col items-end mb-6">
+                  <span className="text-sm opacity-70 mb-1">
+                    TOTAL ESTIMADO
+                  </span>
+                  {appliesDiscount && (
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="bg-green-500/20 text-green-400 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider">
+                        {discountPercentage * 100}% OFF POR MAYORISTA
+                      </span>
+                      <span className="text-lg text-white/40 line-through decoration-white/40">
+                        $
+                        {baseTotal.toLocaleString(undefined, {
+                          minimumFractionDigits: 2,
+                        })}
+                      </span>
+                    </div>
+                  )}
+                  <span className="text-4xl font-satoshi font-bold text-gold">
+                    ${customTotal.toLocaleString()}
+                  </span>
+                </div>
               </div>
-            </div>
               <p className="text-xs text-ice/60 mt-2 text-right">
                 *El precio final puede variar según complejidad del diseño tras
                 revisión.
@@ -579,6 +592,7 @@ export default function CustomService() {
           </div>
         </div>
       </div>
+      {showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} />}
     </div>
   );
 }

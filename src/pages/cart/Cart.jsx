@@ -191,7 +191,7 @@ export default function Cart() {
           {/* Detalles adicionales */}
           {details && (
             <div className="mt-3 p-3 bg-white/[0.03] rounded-lg border border-white/5 mb-8">
-              <p className="text-xs text-ice/70 italic leading-relaxed line-clamp-2">
+              <p className="text-sm text-ice/80  leading-relaxed line-clamp-2">
                 "{details}"
               </p>
             </div>
@@ -319,8 +319,8 @@ export default function Cart() {
               {customs.map((custom) => (
                 <CartItem
                   key={custom.idCustom}
-                  title="Diseño Customizado"
-                  subtitle={`PROJECT ID: CST-${custom.idCustom}`}
+                  subtitle={`Producto Personalizado
+                    PROJECT ID: CST-${custom.idCustom}`}
                   price={custom.customTotal}
                   unitPrice={custom.totalPrice}
                   image={
@@ -331,6 +331,7 @@ export default function Cart() {
                   color={custom.selectedColor}
                   size={custom.selectedSize}
                   details={custom.customerDetails}
+                  title={custom.customName}
                   count={custom.count}
                   isCustom={true}
                   onDelete={() => handleDeleteCustom(custom.idCustom)}

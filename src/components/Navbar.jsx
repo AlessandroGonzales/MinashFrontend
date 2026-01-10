@@ -8,6 +8,7 @@ import {
   Package,
   ShoppingCart,
   UserCircle,
+  ShieldCheck,
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import logo from "../assets/descarga.png";
@@ -23,6 +24,8 @@ export default function Navbar() {
 
   const { isAuthenticated, user, logout } = useAuth();
   const navigate = useNavigate();
+
+  const isCEO = isAuthenticated && user?.role === "CEO";
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -101,7 +104,7 @@ export default function Navbar() {
               )}
             </button>
           </div>
-              
+
           {/* Mobile Hamburger */}
           <button
             onClick={() => setOpen(!open)}
@@ -114,6 +117,15 @@ export default function Navbar() {
         {/* MOBILE MENU */}
         {open && (
           <div className="lg:hidden bg-black/70 text-primary px-6 py-5 border-t border-steel space-y-6 ">
+            {isCEO && (
+              <Link
+                to="/ceo/orders"
+                onClick={() => setOpen(false)}
+                className="flex items-center gap-1 text-gold font-bold py-1 border-b border-gold/20"
+              >
+                <ShieldCheck size={20} /> CONTROL DE PEDIDOS
+              </Link>
+            )}
             <Link
               to="/"
               onClick={() => setOpen(false)}
@@ -164,7 +176,7 @@ export default function Navbar() {
                 <User size={24} />
               )}
             </button>
-          </div >
+          </div>
         )}
       </header>
 
@@ -207,6 +219,18 @@ export default function Navbar() {
               >
                 <X size={20} />
               </button>
+              {/* OPCIÓN CEO DENTRO DEL DROPDOWN */}
+              {isCEO && (
+                <li>
+                  <Link
+                    to="/ceo/orders"
+                    onClick={closeUserMenu}
+                    className="flex items-center gap-3 px-6 py-4 hover:bg-gold/10 text-gold transition font-bold"
+                  >
+                    <ShieldCheck size={18} /> Gestionar Pedidos
+                  </Link>
+                </li>
+              )}
               <li>
                 <Link
                   to="/profile"
